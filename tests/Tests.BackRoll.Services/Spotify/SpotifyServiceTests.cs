@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using BackRoll.Services.Models;
 using BackRoll.Services.Spotify;
 using FluentAssertions;
@@ -12,19 +11,16 @@ using Xunit.Abstractions;
 namespace Tests.BackRoll.Services.Spotify
 {
     [Collection(TestsConstants.MainCollectionName)]
-    public class SpotifyServiceTests
+    public class SpotifyServiceTests : ServicesTestsBase
     {
         private readonly SpotifyClient _spotifyClient;
-        private readonly IMapper _mapper;
-        private readonly ITestOutputHelper _testOutputHelper;
 
         public SpotifyServiceTests(
             ConfigurationFixture configurationFixture,
             ITestOutputHelper testOutputHelper)
+            : base(configurationFixture, testOutputHelper)
         {
             _spotifyClient = configurationFixture.SpotifyClient;
-            _mapper = configurationFixture.Mapper;
-            _testOutputHelper = testOutputHelper;
         }
 
         [Theory]
@@ -34,7 +30,7 @@ namespace Tests.BackRoll.Services.Spotify
             string query, string expectedName, params string[] expectedArtists)
         {
             // arrange
-            var spotifyService = new SpotifyService(_spotifyClient, _mapper);
+            var spotifyService = new SpotifyService(_spotifyClient, Mapper);
             var trackSearchRequest = new TrackSearchRequest()
             {
                 Query = query,
@@ -51,9 +47,7 @@ namespace Tests.BackRoll.Services.Spotify
             track.Artists.Should().Match(x => x.All(a => expectedArtists.Contains(a.Name)));
             track.Url.Should().NotBeNullOrEmpty();
             track.Url.Should().StartWith("https://open.spotify.com/track/");
-            _testOutputHelper.WriteLine($"Track: {track.Name}");
-            _testOutputHelper.WriteLine($"Artists: {string.Join(',', track.Artists.Select(x => x.Name))}");
-            _testOutputHelper.WriteLine($"Url: {track.Url}");
+            LogTrack(track);
         }
 
         [Theory]
@@ -72,7 +66,7 @@ namespace Tests.BackRoll.Services.Spotify
                 expectedUrl = url;
             }
 
-            var spotifyService = new SpotifyService(_spotifyClient, _mapper);
+            var spotifyService = new SpotifyService(_spotifyClient, Mapper);
 
             // act
             var track = await spotifyService.GetTrackByUrlAsync(url);
@@ -91,7 +85,7 @@ namespace Tests.BackRoll.Services.Spotify
         public void Match_HasSpotifyUrl_ShouldMatch(string url)
         {
             // arrange
-            var spotifyService = new SpotifyService(_spotifyClient, _mapper);
+            var spotifyService = new SpotifyService(_spotifyClient, Mapper);
 
             // act
             var result = spotifyService.Match(url);
@@ -106,7 +100,7 @@ namespace Tests.BackRoll.Services.Spotify
         public void Match_DoNotHaveCorrectSpotifyUrl_ShouldNotMatch(string url)
         {
             // arrange
-            var spotifyService = new SpotifyService(_spotifyClient, _mapper);
+            var spotifyService = new SpotifyService(_spotifyClient, Mapper);
 
             // act
             var result = spotifyService.Match(url);

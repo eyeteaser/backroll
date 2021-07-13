@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BackRoll.Services.Spotify;
+using BackRoll.Services.YandexMusic;
 using Microsoft.Extensions.Configuration;
 using SpotifyAPI.Web;
 
@@ -28,6 +29,7 @@ namespace Tests.BackRoll.Services.TestsInfrastructure
             var mockMapper = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<SpotifyProfile>();
+                cfg.AddProfile<YandexMusicProfile>();
             });
             Mapper = mockMapper.CreateMapper();
         }

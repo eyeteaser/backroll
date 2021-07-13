@@ -24,7 +24,7 @@ namespace BackRoll.Services.YandexMusic
         public async Task<Track> FindTrackAsync(TrackSearchRequest request)
         {
             var yandexMusicSearchResults = await _yandexMusicMainResolver.SearchResultLoader.LoadSearchResult(YandexSearchType.Track, request.Query);
-            var yandexMusicTrack = yandexMusicSearchResults.Tracks.FirstOrDefault();
+            var yandexMusicTrack = yandexMusicSearchResults.Tracks?.FirstOrDefault();
             var track = _mapper.Map<Track>(yandexMusicTrack);
             return track;
         }

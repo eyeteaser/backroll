@@ -33,3 +33,6 @@ dotnet_diagnostic.SA1201.severity = none
 
 # SA1602: Enumeration items should be documented
 dotnet_diagnostic.SA1602.severity = none
+
+# SA1310: Field names should not contain underscore
+dotnet_diagnostic.SA1310.severity = none

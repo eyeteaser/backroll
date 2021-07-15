@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackRoll", "src\BackRoll\BackRoll.csproj", "{062325AB-6BAE-4330-B9ED-0649AAE204BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,10 @@ Global
 		{AC36348E-F049-4760-8E2A-4D9A34F940AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC36348E-F049-4760-8E2A-4D9A34F940AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC36348E-F049-4760-8E2A-4D9A34F940AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{062325AB-6BAE-4330-B9ED-0649AAE204BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{062325AB-6BAE-4330-B9ED-0649AAE204BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{062325AB-6BAE-4330-B9ED-0649AAE204BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{062325AB-6BAE-4330-B9ED-0649AAE204BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -37,6 +43,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E4663E12-6785-4596-80B3-02B3AD3FB772} = {04EFEF67-1830-4B7A-9E41-99F49A4FC164}
 		{AC36348E-F049-4760-8E2A-4D9A34F940AF} = {8D490814-7834-4F8B-9AE1-6B70B3BB36ED}
+		{062325AB-6BAE-4330-B9ED-0649AAE204BF} = {04EFEF67-1830-4B7A-9E41-99F49A4FC164}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C730B7E-3C91-4CE2-BBFC-8B78CB576988}

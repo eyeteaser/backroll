@@ -16,7 +16,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackRoll", "src\BackRoll\BackRoll.csproj", "{062325AB-6BAE-4330-B9ED-0649AAE204BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackRoll.Telegram", "src\BackRoll.Telegram\BackRoll.Telegram.csproj", "{5DE1722B-4AC9-45F8-B4A5-6A1D426F5DCD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.BackRoll.Telegram.Integration", "tests\Tests.BackRoll.Telegram.Integration\Tests.BackRoll.Telegram.Integration.csproj", "{1C92DD38-A063-4403-A587-B08D7CDB0A27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,10 +34,14 @@ Global
 		{AC36348E-F049-4760-8E2A-4D9A34F940AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC36348E-F049-4760-8E2A-4D9A34F940AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC36348E-F049-4760-8E2A-4D9A34F940AF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{062325AB-6BAE-4330-B9ED-0649AAE204BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{062325AB-6BAE-4330-B9ED-0649AAE204BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{062325AB-6BAE-4330-B9ED-0649AAE204BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{062325AB-6BAE-4330-B9ED-0649AAE204BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DE1722B-4AC9-45F8-B4A5-6A1D426F5DCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DE1722B-4AC9-45F8-B4A5-6A1D426F5DCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DE1722B-4AC9-45F8-B4A5-6A1D426F5DCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DE1722B-4AC9-45F8-B4A5-6A1D426F5DCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C92DD38-A063-4403-A587-B08D7CDB0A27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C92DD38-A063-4403-A587-B08D7CDB0A27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C92DD38-A063-4403-A587-B08D7CDB0A27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C92DD38-A063-4403-A587-B08D7CDB0A27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -43,7 +49,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E4663E12-6785-4596-80B3-02B3AD3FB772} = {04EFEF67-1830-4B7A-9E41-99F49A4FC164}
 		{AC36348E-F049-4760-8E2A-4D9A34F940AF} = {8D490814-7834-4F8B-9AE1-6B70B3BB36ED}
-		{062325AB-6BAE-4330-B9ED-0649AAE204BF} = {04EFEF67-1830-4B7A-9E41-99F49A4FC164}
+		{5DE1722B-4AC9-45F8-B4A5-6A1D426F5DCD} = {04EFEF67-1830-4B7A-9E41-99F49A4FC164}
+		{1C92DD38-A063-4403-A587-B08D7CDB0A27} = {8D490814-7834-4F8B-9AE1-6B70B3BB36ED}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C730B7E-3C91-4CE2-BBFC-8B78CB576988}

@@ -28,7 +28,7 @@ namespace BackRoll.Telegram
 
             services
                 .AddSpotify(Configuration)
-                .AddYandexMusic()
+                .AddYandexMusic(Configuration)
                 .AddServices()
                 .AddTelegram(Configuration);
 

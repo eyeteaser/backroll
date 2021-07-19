@@ -38,7 +38,7 @@ namespace Tests.BackRoll.Services.Services
         }
 
         [Theory]
-        [InlineData("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", "https://music.yandex.ru/album/67593/track/610031")]
+        [InlineData("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", "https://music.yandex.ru/track/610031")]
         public async Task FindTrack_CorrectUrl_ShouldReturnTrack(string source, string target)
         {
             // arrange

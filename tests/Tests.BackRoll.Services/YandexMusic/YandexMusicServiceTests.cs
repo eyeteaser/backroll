@@ -6,29 +6,33 @@ using FluentAssertions;
 using Tests.BackRoll.Services.TestsInfrastructure;
 using Xunit;
 using Xunit.Abstractions;
+using YandexMusicResolver;
 
 namespace Tests.BackRoll.Services.YandexMusic
 {
     [Collection(TestsConstants.MainCollectionName)]
     public class YandexMusicServiceTests : ServicesTestsBase
     {
+        private readonly IYandexMusicMainResolver _yandexMusicClient;
+
         public YandexMusicServiceTests(
             ConfigurationFixture configurationFixture,
             ITestOutputHelper testOutputHelper)
             : base(configurationFixture, testOutputHelper)
         {
+            _yandexMusicClient = configurationFixture.YandexMusicClient;
         }
 
         [Theory]
-        [InlineData("never gonna give you up", "Never Gonna Give You Up", "https://music.yandex.ru/album/67593/track/610031", "Rick Astley")]
-        public async Task FindTrackAsync(string query, string expectedName, string expectedUrl, params string[] expectedArtists)
+        [InlineData("never gonna give you up", "Never Gonna Give You Up", "https://music.yandex.ru/track/610031", "Rick Astley")]
+        public async Task FindTrackAsync_TrackExists_ShouldFindTrack(string query, string expectedName, string expectedUrl, params string[] expectedArtists)
         {
             // arrange
             var trackSearchRequest = new TrackSearchRequest()
             {
                 Query = query,
             };
-            var yandexMusicService = new YandexMusicService(Mapper);
+            var yandexMusicService = new YandexMusicService(_yandexMusicClient, Mapper);
 
             // act
             var track = await yandexMusicService.FindTrackAsync(trackSearchRequest);
@@ -46,19 +50,34 @@ namespace Tests.BackRoll.Services.YandexMusic
         }
 
         [Theory]
-        [InlineData("https://music.yandex.ru/album/67593/track/610031")]
-        [InlineData("https://music.yandex.ru/album/67593/track/610031?lang=en", "https://music.yandex.ru/album/67593/track/610031")]
-        [InlineData("look at the new episode of rick and morty https://music.yandex.ru/album/67593/track/610031", "https://music.yandex.ru/album/67593/track/610031")]
-        [InlineData("look at the new episode of rick and morty https://music.yandex.ru/album/67593/track/610031 it's super cool", "https://music.yandex.ru/album/67593/track/610031")]
-        public async Task GetTrackByUrlAsync(string text, string expectedUrl = null)
+        [InlineData("adgdgdgregdfdfh")]
+        public async Task FindTrackAsync_TrackDoesNotExist_ShouldNotFindTrack(string query)
         {
             // arrange
-            if (string.IsNullOrEmpty(expectedUrl))
+            var trackSearchRequest = new TrackSearchRequest()
             {
-                expectedUrl = text;
-            }
+                Query = query,
+            };
+            var yandexMusicService = new YandexMusicService(_yandexMusicClient, Mapper);
 
-            var yandexMusicService = new YandexMusicService(Mapper);
+            // act
+            var track = await yandexMusicService.FindTrackAsync(trackSearchRequest);
+
+            // assert
+            track.Should().BeNull();
+        }
+
+        [Theory]
+        [InlineData("https://music.yandex.ru/album/67593/track/610031", "https://music.yandex.ru/track/610031")]
+        [InlineData("https://music.yandex.ru/album/67593/track/610031?lang=en", "https://music.yandex.ru/track/610031")]
+        [InlineData("look at the new episode of rick and morty https://music.yandex.ru/album/67593/track/610031", "https://music.yandex.ru/track/610031")]
+        [InlineData("look at the new episode of rick and morty https://music.yandex.ru/album/67593/track/610031 it's super cool", "https://music.yandex.ru/track/610031")]
+        [InlineData("https://music.yandex.by/album/67593/track/610031", "https://music.yandex.ru/track/610031")]
+        [InlineData("https://music.yandex.by/track/610031", "https://music.yandex.ru/track/610031")]
+        public async Task GetTrackByUrlAsync_CorrectUrl_ShouldFindTrack(string text, string expectedUrl)
+        {
+            // arrange
+            var yandexMusicService = new YandexMusicService(_yandexMusicClient, Mapper);
 
             // act
             var track = await yandexMusicService.GetTrackByUrlAsync(text);
@@ -74,14 +93,30 @@ namespace Tests.BackRoll.Services.YandexMusic
         }
 
         [Theory]
+        [InlineData("https://music.yandex.ru/album/67593/track/invalid")]
+        public async Task GetTrackByUrlAsync_IncorrectUrl_ShouldNotFindTrack(string text)
+        {
+            // arrange
+            var yandexMusicService = new YandexMusicService(_yandexMusicClient, Mapper);
+
+            // act
+            var track = await yandexMusicService.GetTrackByUrlAsync(text);
+
+            // assert
+            track.Should().BeNull();
+        }
+
+        [Theory]
         [InlineData("https://music.yandex.ru/album/67593/track/610031")]
         [InlineData("https://music.yandex.ru/album/67593/track/610031?lang=en")]
         [InlineData("look at the new episode of rick and morty https://music.yandex.ru/album/67593/track/610031")]
         [InlineData("look at the new episode of rick and morty https://music.yandex.ru/album/67593/track/610031 it's super cool")]
+        [InlineData("https://music.yandex.by/album/67593/track/610031")]
+        [InlineData("https://music.yandex.by/track/610031")]
         public void Match(string text)
         {
             // arrange
-            var yandexMusicService = new YandexMusicService(Mapper);
+            var yandexMusicService = new YandexMusicService(_yandexMusicClient, Mapper);
 
             // act
             // assert

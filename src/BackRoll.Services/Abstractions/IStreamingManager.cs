@@ -5,6 +5,6 @@ namespace BackRoll.Services.Abstractions
 {
     public interface IStreamingManager
     {
-        Task<Track> FindTrackAsync(string url);
+        Task<Track> FindTrackAsync(string url, StreamingService streamingService);
     }
 }

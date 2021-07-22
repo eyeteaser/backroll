@@ -1,4 +1,4 @@
-name: yandex.alice.sdk
+name: backroll
 
 on: [push, pull_request]
 

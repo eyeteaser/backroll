@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackRoll.Services.Abstractions;
 using BackRoll.Services.Exceptions;
+using BackRoll.Services.Models;
 using BackRoll.Services.Services;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,10 +32,25 @@ namespace Tests.BackRoll.Services.Services
             var streamingManager = new StreamingManager(_services.GetService<IEnumerable<IStreamingService>>());
 
             // act
-            Func<Task> act = () => streamingManager.FindTrackAsync(text);
+            Func<Task> act = () => streamingManager.FindTrackAsync(text, StreamingService.Undefined);
 
             // assert
-            act.Should().Throw<MatchingStreamingServiceNotFoundException>();
+            act.Should().Throw<StreamingServiceNotFoundException>()
+                .Which.ErrorCode.Should().Be(StreamingServiceNotFoundException.MatchingServiceNotFound);
+        }
+
+        [Fact]
+        public void FindTrack_UnknownStreamingService_ShouldThrowException()
+        {
+            // arrange
+            var streamingManager = new StreamingManager(_services.GetService<IEnumerable<IStreamingService>>());
+
+            // act
+            Func<Task> act = () => streamingManager.FindTrackAsync("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", StreamingService.Undefined);
+
+            // assert
+            act.Should().Throw<StreamingServiceNotFoundException>()
+                .Which.ErrorCode.Should().Be(StreamingServiceNotFoundException.ServiceNotFound);
         }
 
         [Theory]
@@ -45,7 +61,7 @@ namespace Tests.BackRoll.Services.Services
             var streamingManager = new StreamingManager(_services.GetService<IEnumerable<IStreamingService>>());
 
             // act
-            var track = await streamingManager.FindTrackAsync(source);
+            var track = await streamingManager.FindTrackAsync(source, StreamingService.YandexMusic);
 
             // assert
             track.Should().NotBeNull();

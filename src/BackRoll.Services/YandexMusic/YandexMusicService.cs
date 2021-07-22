@@ -14,6 +14,8 @@ namespace BackRoll.Services.YandexMusic
         private readonly IYandexMusicMainResolver _yandexMusicMainResolver;
         private readonly IMapper _mapper;
 
+        public StreamingService Name => StreamingService.YandexMusic;
+
         public YandexMusicService(IYandexMusicMainResolver yandexMusicMainResolver, IMapper mapper)
         {
             _yandexMusicMainResolver = yandexMusicMainResolver;

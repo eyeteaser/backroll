@@ -14,6 +14,8 @@ namespace BackRoll.Services.Spotify
         private readonly SpotifyClient _spotifyClient;
         private readonly IMapper _mapper;
 
+        public StreamingService Name => StreamingService.Spotify;
+
         public SpotifyService(
             SpotifyClient spotifyClient,
             IMapper mapper)

@@ -16,24 +16,23 @@ namespace BackRoll.Services.Services
             _streamingServices = streamingServices.ToArray();
         }
 
-        public async Task<Track> FindTrackAsync(string url)
+        public async Task<Track> FindTrackAsync(string url, StreamingService streamingService)
         {
-            var streamingService = _streamingServices.FirstOrDefault(ss => ss.Match(url));
-            if (streamingService == null)
+            var sourceStreamingService = _streamingServices.FirstOrDefault(ss => ss.Match(url));
+            if (sourceStreamingService == null)
             {
-                throw new MatchingStreamingServiceNotFoundException();
+                throw StreamingServiceNotFoundException.MatchingServiceNotFoundException();
             }
 
-            Track track = null;
-            if (streamingService != null)
+            var targetStreamingService = _streamingServices
+                .FirstOrDefault(ss => ss.Name == streamingService);
+            if (targetStreamingService == null)
             {
-                var originalTrack = await streamingService.GetTrackByUrlAsync(url);
-                var service = _streamingServices
-                    .FirstOrDefault(ss => ss != streamingService);
-
-                track = await service.FindTrackAsync(CreateRequest(originalTrack));
+                throw StreamingServiceNotFoundException.ServiceNotFoundException(streamingService);
             }
 
+            var originalTrack = await sourceStreamingService.GetTrackByUrlAsync(url);
+            Track track = await targetStreamingService.FindTrackAsync(CreateRequest(originalTrack));
             return track;
         }
 

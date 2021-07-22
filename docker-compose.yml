@@ -23,3 +23,6 @@ services:
       - YandexMusic__ProxyUserName=${YANDEXMUSIC_PROXYUSERNAME}
       - YandexMusic__ProxyPassword=${YANDEXMUSIC_PROXYPASSWORD}
       - TelegramBot__Secret=${TELEGRAMBOT_SECRET}
+      - TelegramBot__DbConnectionString=${TELEGRAMBOT_DBCONNECTIONSTRING}
+    volumes:
+      - ./data:/app/data

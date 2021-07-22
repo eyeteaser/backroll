@@ -12,6 +12,9 @@ services:
       - YandexMusic__ProxyUserName=${YANDEXMUSIC_PROXYUSERNAME}
       - YandexMusic__ProxyPassword=${YANDEXMUSIC_PROXYPASSWORD}
       - TelegramBot__Secret=${TELEGRAMBOT_SECRET}
+      - TelegramBot__DbConnectionString=${TELEGRAMBOT_DBCONNECTIONSTRING}
+    volumes:
+      - ${WEBAPP_STORAGE_HOME}/site/wwwroot/data:/app/data
     ports:
       - "80"
       - "443"

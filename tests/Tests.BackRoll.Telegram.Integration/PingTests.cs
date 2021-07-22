@@ -1,29 +1,28 @@
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
-using BackRoll.Telegram;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Tests.BackRoll.Telegram.Integration.TestsInfrastructure;
 using Xunit;
 
 namespace Tests.BackRoll.Telegram.Integration
 {
-    public class PingTests : IClassFixture<WebApplicationFactory<Startup>>
+    [Collection(TestsConstants.MainCollectionName)]
+    public class PingTests
     {
-        private readonly WebApplicationFactory<Startup> _factory;
+        private readonly HttpClient _client;
 
-        public PingTests(WebApplicationFactory<Startup> factory)
+        public PingTests(MainFixture mainFixture)
         {
-            _factory = factory;
+            _client = mainFixture.Client;
         }
 
         [Fact]
         public async Task Ping()
         {
             // arrange
-            var client = _factory.CreateClient();
-
             // act
-            var response = await client.GetAsync("/ping");
+            var response = await _client.GetAsync("/ping");
 
             // assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);

@@ -1,27 +1,30 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using BackRoll.Services.Abstractions;
-using BackRoll.Services.Exceptions;
+using BackRoll.Telegram.Scenes;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
+using UpdateType = Telegram.Bot.Types.Enums.UpdateType;
 
 namespace BackRoll.Telegram.Bot
 {
     public class TelegramWorker : BackgroundService
     {
         private readonly TelegramBotClient _botClient;
-        private readonly IStreamingManager _streamingManager;
+        private readonly IScenesManager _scenesManager;
         private readonly ILogger<TelegramWorker> _logger;
 
-        public TelegramWorker(ILogger<TelegramWorker> logger, TelegramBotClient botClient, IStreamingManager streamingManager)
+        public TelegramWorker(
+            TelegramBotClient botClient,
+            IScenesManager scenesManager,
+            ILogger<TelegramWorker> logger)
         {
-            _logger = logger;
             _botClient = botClient;
-            _streamingManager = streamingManager;
+            _scenesManager = scenesManager;
+            _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -32,24 +35,28 @@ namespace BackRoll.Telegram.Bot
 
             await foreach (Update update in updateReceiver.YieldUpdatesAsync())
             {
-                if (update.Message is Message message)
+                Chat chat = GetChat(update);
+                try
                 {
-                    try
-                    {
-                        var track = await _streamingManager.FindTrackAsync(message.Text);
-                        var text = track?.Url;
-                        await _botClient.SendTextMessageAsync(message.Chat, string.IsNullOrEmpty(text) ? "Sorry! Not found =(" : text, cancellationToken: stoppingToken);
-                    }
-                    catch (MatchingStreamingServiceNotFoundException)
-                    {
-                        await _botClient.SendTextMessageAsync(message.Chat, $"Please input correct link to streaming's track", cancellationToken: stoppingToken);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, ex.Message);
-                    }
+                    var response = await _scenesManager.ProcessAsync(update);
+                    await _botClient.SendTextMessageAsync(chat, response.Message, cancellationToken: stoppingToken, replyMarkup: response.ReplyMarkup);
+                }
+                catch (Exception ex)
+                {
+                    await _botClient.SendTextMessageAsync(chat, "I can't process your request. Please try again later", cancellationToken: stoppingToken);
+                    _logger.LogError(ex, ex.Message);
                 }
             }
+        }
+
+        private static Chat GetChat(Update update)
+        {
+            return update.Type switch
+            {
+                UpdateType.Message => update.Message.Chat,
+                UpdateType.CallbackQuery => update.CallbackQuery.Message.Chat,
+                _ => null,
+            };
         }
     }
 }

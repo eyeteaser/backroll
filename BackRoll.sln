@@ -16,9 +16,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackRoll.Telegram", "src\BackRoll.Telegram\BackRoll.Telegram.csproj", "{5DE1722B-4AC9-45F8-B4A5-6A1D426F5DCD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackRoll.Telegram", "src\BackRoll.Telegram\BackRoll.Telegram.csproj", "{5DE1722B-4AC9-45F8-B4A5-6A1D426F5DCD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.BackRoll.Telegram.Integration", "tests\Tests.BackRoll.Telegram.Integration\Tests.BackRoll.Telegram.Integration.csproj", "{1C92DD38-A063-4403-A587-B08D7CDB0A27}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.BackRoll.Telegram.Integration", "tests\Tests.BackRoll.Telegram.Integration\Tests.BackRoll.Telegram.Integration.csproj", "{1C92DD38-A063-4403-A587-B08D7CDB0A27}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{56D96F59-0D02-4C54-A45A-1363719FFEBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +44,10 @@ Global
 		{1C92DD38-A063-4403-A587-B08D7CDB0A27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C92DD38-A063-4403-A587-B08D7CDB0A27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C92DD38-A063-4403-A587-B08D7CDB0A27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56D96F59-0D02-4C54-A45A-1363719FFEBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56D96F59-0D02-4C54-A45A-1363719FFEBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56D96F59-0D02-4C54-A45A-1363719FFEBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56D96F59-0D02-4C54-A45A-1363719FFEBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

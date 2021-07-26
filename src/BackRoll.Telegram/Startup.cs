@@ -47,8 +47,6 @@ namespace BackRoll.Telegram
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseAuthorization();

@@ -26,6 +26,7 @@ namespace Tests.BackRoll.Services.TestsInfrastructure
         {
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.testing.json")
+                .AddEnvironmentVariables()
                 .AddUserSecrets(GetType().Assembly)
                 .Build();
 

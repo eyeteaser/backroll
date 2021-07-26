@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  backroll.telegram:
+    image: alexvolchetsky/backroll:latest
+    environment:
+      - Spotify__ClientId=${SPOTIFY_CLIENTID}
+      - Spotify__ClientSecret=${SPOTIFY_CLIENTSECRET}
+      - YandexMusic__UseProxy=${YANDEXMUSIC_USEPROXY}
+      - YandexMusic__ProxyHost=${YANDEXMUSIC_PROXYHOST}
+      - YandexMusic__ProxyPort=${YANDEXMUSIC_PROXYPORT}
+      - YandexMusic__ProxyUserName=${YANDEXMUSIC_PROXYUSERNAME}
+      - YandexMusic__ProxyPassword=${YANDEXMUSIC_PROXYPASSWORD}
+      - TelegramBot__Secret=${TELEGRAMBOT_SECRET}
+    ports:
+      - "80"
+      - "443"

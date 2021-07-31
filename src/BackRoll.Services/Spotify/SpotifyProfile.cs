@@ -11,6 +11,8 @@ namespace BackRoll.Services.Spotify
             CreateMap<FullTrack, Track>();
 
             CreateMap<SimpleArtist, Artist>();
+
+            CreateMap<SimpleAlbum, Album>();
         }
     }
 }

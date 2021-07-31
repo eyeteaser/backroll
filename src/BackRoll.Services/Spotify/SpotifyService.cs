@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using AutoMapper;
 using BackRoll.Services.Abstractions;
 using BackRoll.Services.Models;
+using BackRoll.Services.Services;
 using SpotifyAPI.Web;
 
 namespace BackRoll.Services.Spotify
 {
-    public class SpotifyService : IStreamingService
+    public class SpotifyService : BaseStreamingService, IStreamingService
     {
         private readonly SpotifyClient _spotifyClient;
         private readonly IMapper _mapper;
@@ -26,10 +27,16 @@ namespace BackRoll.Services.Spotify
 
         public async Task<Track> FindTrackAsync(TrackSearchRequest request)
         {
-            var searchRequest = new SearchRequest(SearchRequest.Types.Track, request.Query);
+            string query = BuildTrackSearchQuery(request);
+            var searchRequest = new SearchRequest(SearchRequest.Types.Track, query);
             var searchResponse = await _spotifyClient.Search.Item(searchRequest);
 
-            var foundTrack = searchResponse.Tracks.Items.FirstOrDefault();
+            var foundTrack = searchResponse.Tracks.Items.FirstOrDefault(x => x.Album.Name == request.Album);
+            if (foundTrack == null)
+            {
+                foundTrack = searchResponse.Tracks.Items.FirstOrDefault();
+            }
+
             var track = Map(foundTrack);
 
             return track;

@@ -6,14 +6,16 @@ using System.Threading.Tasks;
 using AutoMapper;
 using BackRoll.Services.Abstractions;
 using BackRoll.Services.Models;
+using BackRoll.Services.Services;
 using Yandex.Music.Api;
 using Yandex.Music.Api.Common;
+using Yandex.Music.Api.Models.Search.Album;
 using Yandex.Music.Api.Models.Search.Track;
 using Yandex.Music.Api.Models.Track;
 
 namespace BackRoll.Services.YandexMusic
 {
-    public class YandexMusicService : IStreamingService
+    public class YandexMusicService : BaseStreamingService, IStreamingService
     {
         private readonly YandexMusicApi _yandexMusicClient;
         private readonly AuthStorage _authStorage;
@@ -29,11 +31,25 @@ namespace BackRoll.Services.YandexMusic
 
         public async Task<Track> FindTrackAsync(TrackSearchRequest request)
         {
-            var yandexMusicSearchResults = await _yandexMusicClient.Search.TrackAsync(_authStorage, request.Query);
-            var yandexMusicTrack = yandexMusicSearchResults.Result.Tracks?.Results.FirstOrDefault();
-            if (yandexMusicTrack != null)
+            string query = BuildTrackSearchQuery(request);
+            var yandexMusicSearchResults = await _yandexMusicClient.Search.TrackAsync(_authStorage, query);
+            if (yandexMusicSearchResults.Result.Tracks != null && yandexMusicSearchResults.Result.Tracks.Results.Any())
             {
-                var track = Map(yandexMusicTrack);
+                // we will always return first track in case if we didn't it by album
+                var firstTrack = yandexMusicSearchResults.Result.Tracks.Results.First();
+                var trackAlbum = new Tuple<YSearchTrackModel, YSearchAlbumModel>(firstTrack, firstTrack.Albums.FirstOrDefault());
+
+                foreach (var yandexMusicTrack in yandexMusicSearchResults.Result.Tracks.Results)
+                {
+                    var album = yandexMusicTrack.Albums.FirstOrDefault(x => x.Title == request.Album);
+                    if (album != null)
+                    {
+                        trackAlbum = new Tuple<YSearchTrackModel, YSearchAlbumModel>(yandexMusicTrack, album);
+                        break;
+                    }
+                }
+
+                var track = Map(trackAlbum.Item1, trackAlbum.Item2);
                 return track;
             }
 
@@ -43,11 +59,11 @@ namespace BackRoll.Services.YandexMusic
         public async Task<Track> GetTrackByUrlAsync(string url)
         {
             Track track = null;
-            string id = GetId(url);
-            if (!string.IsNullOrEmpty(id))
+            var (albumId, trackId) = GetAlbumIdAndTrackId(url);
+            if (!string.IsNullOrEmpty(trackId))
             {
-                var yandexMusicTrack = (await _yandexMusicClient.Track.GetAsync(_authStorage, id)).Result.FirstOrDefault();
-                track = Map(yandexMusicTrack);
+                var yandexMusicTrack = (await _yandexMusicClient.Track.GetAsync(_authStorage, trackId)).Result.FirstOrDefault();
+                track = Map(yandexMusicTrack, albumId);
             }
 
             return track;
@@ -55,19 +71,22 @@ namespace BackRoll.Services.YandexMusic
 
         public bool Match(string url)
         {
-            return !string.IsNullOrEmpty(GetId(url));
+            var (_, trackId) = GetAlbumIdAndTrackId(url);
+            return !string.IsNullOrEmpty(trackId);
         }
 
-        private static string GetId(string url)
+        private static (string, string) GetAlbumIdAndTrackId(string url)
         {
-            string id = null;
-            var match = Regex.Match(url, @"https:\/\/music\.yandex\.\w+(\/album\/\d+)?\/track\/(?<id>\d+)");
+            string trackId = null;
+            string albumId = null;
+            var match = Regex.Match(url, @"https:\/\/music\.yandex\.\w+(?:\/album\/(?<albumid>\d+))?\/track\/(?<trackid>\d+)");
             if (match.Success)
             {
-                id = match.Groups["id"].Value;
+                albumId = match.Groups["albumid"].Value;
+                trackId = match.Groups["trackid"].Value;
             }
 
-            return id;
+            return (albumId, trackId);
         }
 
         private static (YandexMusicApi, AuthStorage) GetYandexMusicClient(YandexMusicConfig config)
@@ -87,27 +106,43 @@ namespace BackRoll.Services.YandexMusic
             return (new YandexMusicApi(), authStorage);
         }
 
-        private static void SetTrackUrl(Track track, string trackId)
+        private static void SetTrackUrl(Track track, string trackId, string albumId)
         {
             if (track != null)
             {
-                // set track url ignoring album
-                // track may be in different albums and album can be not available in the region of user but track may be available
-                track.Url = $"https://music.yandex.ru/track/{trackId}";
+                string trackUrl = "https://music.yandex.ru";
+                if (!string.IsNullOrEmpty(albumId))
+                {
+                    trackUrl += $"/album/{albumId}";
+                }
+
+                trackUrl += $"/track/{trackId}";
+                track.Url = trackUrl;
             }
         }
 
-        private Track Map(YTrack yandexMusicTrack)
+        private Track Map(YTrack yandexMusicTrack, string albumId)
         {
             var track = _mapper.Map<Track>(yandexMusicTrack);
-            SetTrackUrl(track, yandexMusicTrack.Id);
+            if (yandexMusicTrack != null)
+            {
+                var album = yandexMusicTrack.Albums.FirstOrDefault(x => x.Id == albumId);
+                track.Album = _mapper.Map<Album>(album);
+                SetTrackUrl(track, yandexMusicTrack.Id, albumId);
+            }
+
             return track;
         }
 
-        private Track Map(YSearchTrackModel yandexMusicTrack)
+        private Track Map(YSearchTrackModel yandexMusicTrack, YSearchAlbumModel album)
         {
             var track = _mapper.Map<Track>(yandexMusicTrack);
-            SetTrackUrl(track, yandexMusicTrack.Id);
+            if (yandexMusicTrack != null)
+            {
+                track.Album = _mapper.Map<Album>(album);
+                SetTrackUrl(track, yandexMusicTrack.Id, album?.Id);
+            }
+
             return track;
         }
     }

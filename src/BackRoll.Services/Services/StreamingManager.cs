@@ -36,6 +36,11 @@ namespace BackRoll.Services.Services
             return track;
         }
 
-        private static TrackSearchRequest CreateRequest(Track track) => new () { Query = $"{track.Name} {string.Join(",", track.Artists.Select(a => a.Name))}" };
+        private static TrackSearchRequest CreateRequest(Track track) => new ()
+        {
+            Track = track.Name,
+            Artists = track.Artists.Select(a => a.Name).ToList(),
+            Album = track.Album?.Name,
+        };
     }
 }

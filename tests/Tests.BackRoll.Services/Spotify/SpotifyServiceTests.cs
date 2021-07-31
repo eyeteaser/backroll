@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BackRoll.Services.Models;
 using BackRoll.Services.Spotify;
@@ -24,16 +25,19 @@ namespace Tests.BackRoll.Services.Spotify
         }
 
         [Theory]
-        [InlineData("уходи anacondaz", "Уходи", "Anacondaz")]
-        [InlineData("don't you worry child", "Don't You Worry Child - Radio Edit", "Swedish House Mafia", "John Martin")]
+        [InlineData("уходи", "anacondaz", "Уходи", "Перезвони мне +79995771202", "Anacondaz")]
+        [InlineData("don't you worry child", "swedish house mafia", "Don't You Worry Child - Radio Edit", "Don't You Worry Child", "Swedish House Mafia", "John Martin")]
+        [InlineData("ядреность образ жизни", "нейромонах", "Ядрёность - Образ Жизни (Акустическая Версия)", "Акустика", "Neuromonakh Feofan")]
         public async Task FindTrack_TrackExists_ShouldReturnTrack(
-            string query, string expectedName, params string[] expectedArtists)
+            string trackName, string artist, string expectedName, string expectedAlbum, params string[] expectedArtists)
         {
             // arrange
             var spotifyService = new SpotifyService(_spotifyClient, Mapper);
             var trackSearchRequest = new TrackSearchRequest()
             {
-                Query = query,
+                Track = trackName,
+                Artists = new List<string>() { artist },
+                Album = expectedAlbum,
             };
 
             // act
@@ -47,6 +51,8 @@ namespace Tests.BackRoll.Services.Spotify
             track.Artists.Should().Match(x => x.All(a => expectedArtists.Contains(a.Name)));
             track.Url.Should().NotBeNullOrEmpty();
             track.Url.Should().StartWith("https://open.spotify.com/track/");
+            track.Album.Should().NotBeNull();
+            track.Album.Name.Should().Be(expectedAlbum);
             LogTrack(track);
         }
 

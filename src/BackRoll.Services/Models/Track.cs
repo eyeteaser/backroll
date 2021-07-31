@@ -6,6 +6,8 @@
 
         public Artist[] Artists { get; set; }
 
+        public Album Album { get; set; }
+
         public string Url { get; set; }
     }
 }

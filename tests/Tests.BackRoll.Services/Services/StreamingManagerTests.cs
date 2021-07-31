@@ -54,14 +54,15 @@ namespace Tests.BackRoll.Services.Services
         }
 
         [Theory]
-        [InlineData("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", "https://music.yandex.ru/track/610031")]
-        public async Task FindTrack_CorrectUrl_ShouldReturnTrack(string source, string target)
+        [InlineData("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", "https://music.yandex.ru/album/1910064/track/610031", StreamingService.YandexMusic)]
+        [InlineData("https://music.yandex.ru/album/11575610/track/69278563", "https://open.spotify.com/track/3ZFNg261EvTB9sBElOpoWj", StreamingService.Spotify)]
+        public async Task FindTrack_CorrectUrl_ShouldReturnTrack(string source, string target, StreamingService targetName)
         {
             // arrange
             var streamingManager = new StreamingManager(_services.GetService<IEnumerable<IStreamingService>>());
 
             // act
-            var track = await streamingManager.FindTrackAsync(source, StreamingService.YandexMusic);
+            var track = await streamingManager.FindTrackAsync(source, targetName);
 
             // assert
             track.Should().NotBeNull();

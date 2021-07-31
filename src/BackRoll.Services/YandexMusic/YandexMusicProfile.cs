@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using BackRoll.Services.Models;
+using Yandex.Music.Api.Models.Album;
 using Yandex.Music.Api.Models.Artist;
+using Yandex.Music.Api.Models.Search.Album;
 using Yandex.Music.Api.Models.Search.Artist;
 using Yandex.Music.Api.Models.Search.Track;
 using Yandex.Music.Api.Models.Track;
@@ -20,6 +22,12 @@ namespace BackRoll.Services.YandexMusic
             CreateMap<YArtist, Artist>();
 
             CreateMap<YSearchArtist, Artist>();
+
+            CreateMap<YSearchAlbumModel, Album>()
+                .ForMember(x => x.Name, opt => opt.MapFrom(x => x.Title));
+
+            CreateMap<YAlbum, Album>()
+                .ForMember(x => x.Name, opt => opt.MapFrom(x => x.Title));
         }
     }
 }

@@ -13,6 +13,8 @@ COPY src/*/*.csproj ./
 RUN for file in $(ls *.csproj); do mkdir -p src/${file%.*}/ && mv $file src/${file%.*}/; done
 COPY tests/*/*.csproj ./  
 RUN for file in $(ls *.csproj); do mkdir -p tests/${file%.*}/ && mv $file tests/${file%.*}/; done
+COPY Yandex.Music.Api/*/*.csproj ./
+RUN for file in $(ls *.csproj); do mkdir -p Yandex.Music.Api/${file%.*}/ && mv $file Yandex.Music.Api/${file%.*}/; done
 RUN dotnet restore BackRoll.sln
 COPY . .
 RUN dotnet build BackRoll.sln -c Release -o /app/build

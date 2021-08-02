@@ -6,21 +6,20 @@ using FluentAssertions;
 using Tests.BackRoll.Services.TestsInfrastructure;
 using Xunit;
 using Xunit.Abstractions;
-using YandexMusicResolver;
 
 namespace Tests.BackRoll.Services.YandexMusic
 {
     [Collection(TestsConstants.MainCollectionName)]
     public class YandexMusicServiceTests : ServicesTestsBase
     {
-        private readonly IYandexMusicMainResolver _yandexMusicClient;
+        private readonly YandexMusicConfig _yandexMusicConfig;
 
         public YandexMusicServiceTests(
             ConfigurationFixture configurationFixture,
             ITestOutputHelper testOutputHelper)
             : base(configurationFixture, testOutputHelper)
         {
-            _yandexMusicClient = configurationFixture.YandexMusicClient;
+            _yandexMusicConfig = configurationFixture.YandexMusicConfig;
         }
 
         [Theory]
@@ -32,7 +31,7 @@ namespace Tests.BackRoll.Services.YandexMusic
             {
                 Query = query,
             };
-            var yandexMusicService = new YandexMusicService(_yandexMusicClient, Mapper);
+            var yandexMusicService = new YandexMusicService(_yandexMusicConfig, Mapper);
 
             // act
             var track = await yandexMusicService.FindTrackAsync(trackSearchRequest);
@@ -58,7 +57,7 @@ namespace Tests.BackRoll.Services.YandexMusic
             {
                 Query = query,
             };
-            var yandexMusicService = new YandexMusicService(_yandexMusicClient, Mapper);
+            var yandexMusicService = new YandexMusicService(_yandexMusicConfig, Mapper);
 
             // act
             var track = await yandexMusicService.FindTrackAsync(trackSearchRequest);
@@ -77,7 +76,7 @@ namespace Tests.BackRoll.Services.YandexMusic
         public async Task GetTrackByUrlAsync_CorrectUrl_ShouldFindTrack(string text, string expectedUrl)
         {
             // arrange
-            var yandexMusicService = new YandexMusicService(_yandexMusicClient, Mapper);
+            var yandexMusicService = new YandexMusicService(_yandexMusicConfig, Mapper);
 
             // act
             var track = await yandexMusicService.GetTrackByUrlAsync(text);
@@ -97,7 +96,7 @@ namespace Tests.BackRoll.Services.YandexMusic
         public async Task GetTrackByUrlAsync_IncorrectUrl_ShouldNotFindTrack(string text)
         {
             // arrange
-            var yandexMusicService = new YandexMusicService(_yandexMusicClient, Mapper);
+            var yandexMusicService = new YandexMusicService(_yandexMusicConfig, Mapper);
 
             // act
             var track = await yandexMusicService.GetTrackByUrlAsync(text);
@@ -116,7 +115,7 @@ namespace Tests.BackRoll.Services.YandexMusic
         public void Match(string text)
         {
             // arrange
-            var yandexMusicService = new YandexMusicService(_yandexMusicClient, Mapper);
+            var yandexMusicService = new YandexMusicService(_yandexMusicConfig, Mapper);
 
             // act
             // assert

@@ -6,7 +6,6 @@ using BackRoll.Services.YandexMusic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SpotifyAPI.Web;
-using YandexMusicResolver;
 
 namespace Tests.BackRoll.Services.TestsInfrastructure
 {
@@ -20,7 +19,7 @@ namespace Tests.BackRoll.Services.TestsInfrastructure
 
         public SpotifyClient SpotifyClient { get; }
 
-        public IYandexMusicMainResolver YandexMusicClient { get; }
+        public YandexMusicConfig YandexMusicConfig { get; }
 
         public ConfigurationFixture()
         {
@@ -50,9 +49,8 @@ namespace Tests.BackRoll.Services.TestsInfrastructure
             configuration.GetSection(SpotifyConfig.CONFIG_SECTION).Bind(SpotifyConfig);
             SpotifyClient = SpotifyClientFactory.CreateSpotifyClient(SpotifyConfig);
 
-            var yandexMusicConfig = new YandexMusicConfig();
-            configuration.GetSection(YandexMusicConfig.CONFIG_SECTION).Bind(yandexMusicConfig);
-            YandexMusicClient = YandexMusicClientFactory.CreateYandexMusicClient(yandexMusicConfig);
+            YandexMusicConfig = new YandexMusicConfig();
+            configuration.GetSection(YandexMusicConfig.CONFIG_SECTION).Bind(YandexMusicConfig);
         }
     }
 }

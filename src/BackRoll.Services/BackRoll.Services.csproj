@@ -16,7 +16,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="YandexMusicResolver" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Yandex.Music.Api\Yandex.Music.Api\Yandex.Music.Api.csproj" />
   </ItemGroup>
 
 </Project>

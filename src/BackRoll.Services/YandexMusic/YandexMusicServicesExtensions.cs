@@ -10,7 +10,8 @@ namespace BackRoll.Services.YandexMusic
         {
             var yandexMusicConfig = new YandexMusicConfig();
             configuration.GetSection(YandexMusicConfig.CONFIG_SECTION).Bind(yandexMusicConfig);
-            services.AddSingleton(YandexMusicClientFactory.CreateYandexMusicClient(yandexMusicConfig));
+            services.AddSingleton(yandexMusicConfig);
+
             services.AddSingleton<IStreamingService, YandexMusicService>();
 
             return services;

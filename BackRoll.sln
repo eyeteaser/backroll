@@ -24,6 +24,10 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.BackRoll.Telegram", "tests\Tests.BackRoll.Telegram\Tests.BackRoll.Telegram.csproj", "{C5AFF616-9403-4D44-946A-833ACF591D1A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "submodules", "submodules", "{9EBA5381-7F67-4B8C-BF3E-249CD8DDBC59}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yandex.Music.Api", "Yandex.Music.Api\Yandex.Music.Api\Yandex.Music.Api.csproj", "{4CFCDC49-9A26-4C27-8123-67CDBBA90387}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +58,10 @@ Global
 		{C5AFF616-9403-4D44-946A-833ACF591D1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5AFF616-9403-4D44-946A-833ACF591D1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5AFF616-9403-4D44-946A-833ACF591D1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CFCDC49-9A26-4C27-8123-67CDBBA90387}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CFCDC49-9A26-4C27-8123-67CDBBA90387}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CFCDC49-9A26-4C27-8123-67CDBBA90387}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CFCDC49-9A26-4C27-8123-67CDBBA90387}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,6 +72,7 @@ Global
 		{5DE1722B-4AC9-45F8-B4A5-6A1D426F5DCD} = {04EFEF67-1830-4B7A-9E41-99F49A4FC164}
 		{1C92DD38-A063-4403-A587-B08D7CDB0A27} = {8D490814-7834-4F8B-9AE1-6B70B3BB36ED}
 		{C5AFF616-9403-4D44-946A-833ACF591D1A} = {8D490814-7834-4F8B-9AE1-6B70B3BB36ED}
+		{4CFCDC49-9A26-4C27-8123-67CDBBA90387} = {9EBA5381-7F67-4B8C-BF3E-249CD8DDBC59}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C730B7E-3C91-4CE2-BBFC-8B78CB576988}

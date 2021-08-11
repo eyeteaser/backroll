@@ -21,7 +21,9 @@ namespace BackRoll.Services.YandexMusic
         private readonly AuthStorage _authStorage;
         private readonly IMapper _mapper;
 
-        public StreamingService Name => StreamingService.YandexMusic;
+        public override StreamingService Name => StreamingService.YandexMusic;
+
+        public override string TrackUrlRegex => @"https:\/\/music\.yandex\.\w+(?:\/album\/(?<albumid>\d+))?\/track\/(?<trackid>\d+)";
 
         public YandexMusicService(YandexMusicConfig yandexMusicConfig, IMapper mapper)
         {
@@ -29,9 +31,14 @@ namespace BackRoll.Services.YandexMusic
             _mapper = mapper;
         }
 
-        public async Task<Track> FindTrackAsync(TrackSearchRequest request)
+        protected override async Task<Track> GetTrackByUrlInternalAsync(TrackUrlInfo trackUrlInfo)
         {
-            string query = BuildTrackSearchQuery(request);
+            var yandexMusicTrack = (await _yandexMusicClient.Track.GetAsync(_authStorage, trackUrlInfo.TrackId)).Result.FirstOrDefault();
+            return Map(yandexMusicTrack, trackUrlInfo.AlbumId);
+        }
+
+        protected override async Task<Track> FindTrackInternalAsync(TrackSearchRequest request, string query)
+        {
             var yandexMusicSearchResults = await _yandexMusicClient.Search.TrackAsync(_authStorage, query);
             if (yandexMusicSearchResults.Result.Tracks != null && yandexMusicSearchResults.Result.Tracks.Results.Any())
             {
@@ -54,39 +61,6 @@ namespace BackRoll.Services.YandexMusic
             }
 
             return null;
-        }
-
-        public async Task<Track> GetTrackByUrlAsync(string url)
-        {
-            Track track = null;
-            var (albumId, trackId) = GetAlbumIdAndTrackId(url);
-            if (!string.IsNullOrEmpty(trackId))
-            {
-                var yandexMusicTrack = (await _yandexMusicClient.Track.GetAsync(_authStorage, trackId)).Result.FirstOrDefault();
-                track = Map(yandexMusicTrack, albumId);
-            }
-
-            return track;
-        }
-
-        public bool Match(string url)
-        {
-            var (_, trackId) = GetAlbumIdAndTrackId(url);
-            return !string.IsNullOrEmpty(trackId);
-        }
-
-        private static (string, string) GetAlbumIdAndTrackId(string url)
-        {
-            string trackId = null;
-            string albumId = null;
-            var match = Regex.Match(url, @"https:\/\/music\.yandex\.\w+(?:\/album\/(?<albumid>\d+))?\/track\/(?<trackid>\d+)");
-            if (match.Success)
-            {
-                albumId = match.Groups["albumid"].Value;
-                trackId = match.Groups["trackid"].Value;
-            }
-
-            return (albumId, trackId);
         }
 
         private static (YandexMusicApi, AuthStorage) GetYandexMusicClient(YandexMusicConfig config)

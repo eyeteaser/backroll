@@ -14,12 +14,16 @@ namespace Tests.BackRoll.Services.YandexMusic
     {
         private readonly YandexMusicConfig _yandexMusicConfig;
 
+        private readonly YandexMusicService _sut;
+
         public YandexMusicServiceTests(
             ConfigurationFixture configurationFixture,
             ITestOutputHelper testOutputHelper)
             : base(configurationFixture, testOutputHelper)
         {
             _yandexMusicConfig = configurationFixture.YandexMusicConfig;
+
+            _sut = new YandexMusicService(_yandexMusicConfig, Mapper);
         }
 
         [Theory]
@@ -32,10 +36,9 @@ namespace Tests.BackRoll.Services.YandexMusic
                 Track = expectedName,
                 Artists = expectedArtists.ToList(),
             };
-            var yandexMusicService = new YandexMusicService(_yandexMusicConfig, Mapper);
 
             // act
-            var track = await yandexMusicService.FindTrackAsync(trackSearchRequest);
+            var track = await _sut.FindTrackAsync(trackSearchRequest);
 
             // assert
             track.Should().NotBeNull();
@@ -60,10 +63,9 @@ namespace Tests.BackRoll.Services.YandexMusic
             {
                 Track = trackName,
             };
-            var yandexMusicService = new YandexMusicService(_yandexMusicConfig, Mapper);
 
             // act
-            var track = await yandexMusicService.FindTrackAsync(trackSearchRequest);
+            var track = await _sut.FindTrackAsync(trackSearchRequest);
 
             // assert
             track.Should().BeNull();
@@ -79,10 +81,8 @@ namespace Tests.BackRoll.Services.YandexMusic
         public async Task GetTrackByUrlAsync_CorrectUrl_ShouldFindTrack(string text, string expectedUrl, string expectedAlbum = null)
         {
             // arrange
-            var yandexMusicService = new YandexMusicService(_yandexMusicConfig, Mapper);
-
             // act
-            var track = await yandexMusicService.GetTrackByUrlAsync(text);
+            var track = await _sut.GetTrackByUrlAsync(text);
 
             // assert
             track.Should().NotBeNull();
@@ -101,10 +101,8 @@ namespace Tests.BackRoll.Services.YandexMusic
         public async Task GetTrackByUrlAsync_CorrectUrlButNoAlbum_ShouldFindTrackWithoutAlbum(string text, string expectedUrl)
         {
             // arrange
-            var yandexMusicService = new YandexMusicService(_yandexMusicConfig, Mapper);
-
             // act
-            var track = await yandexMusicService.GetTrackByUrlAsync(text);
+            var track = await _sut.GetTrackByUrlAsync(text);
 
             // assert
             track.Should().NotBeNull();
@@ -122,10 +120,8 @@ namespace Tests.BackRoll.Services.YandexMusic
         public async Task GetTrackByUrlAsync_IncorrectUrl_ShouldNotFindTrack(string text)
         {
             // arrange
-            var yandexMusicService = new YandexMusicService(_yandexMusicConfig, Mapper);
-
             // act
-            var track = await yandexMusicService.GetTrackByUrlAsync(text);
+            var track = await _sut.GetTrackByUrlAsync(text);
 
             // assert
             track.Should().BeNull();
@@ -141,11 +137,9 @@ namespace Tests.BackRoll.Services.YandexMusic
         public void Match(string text)
         {
             // arrange
-            var yandexMusicService = new YandexMusicService(_yandexMusicConfig, Mapper);
-
             // act
             // assert
-            yandexMusicService.Match(text).Should().BeTrue();
+            _sut.Match(text).Should().BeTrue();
         }
     }
 }

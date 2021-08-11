@@ -16,12 +16,16 @@ namespace Tests.BackRoll.Services.Spotify
     {
         private readonly SpotifyClient _spotifyClient;
 
+        private readonly SpotifyService _sut;
+
         public SpotifyServiceTests(
             ConfigurationFixture configurationFixture,
             ITestOutputHelper testOutputHelper)
             : base(configurationFixture, testOutputHelper)
         {
             _spotifyClient = configurationFixture.SpotifyClient;
+
+            _sut = new SpotifyService(_spotifyClient, Mapper);
         }
 
         [Theory]
@@ -32,7 +36,6 @@ namespace Tests.BackRoll.Services.Spotify
             string trackName, string artist, string expectedName, string expectedAlbum, params string[] expectedArtists)
         {
             // arrange
-            var spotifyService = new SpotifyService(_spotifyClient, Mapper);
             var trackSearchRequest = new TrackSearchRequest()
             {
                 Track = trackName,
@@ -41,7 +44,7 @@ namespace Tests.BackRoll.Services.Spotify
             };
 
             // act
-            var track = await spotifyService.FindTrackAsync(trackSearchRequest);
+            var track = await _sut.FindTrackAsync(trackSearchRequest);
 
             // assert
             track.Should().NotBeNull();
@@ -72,10 +75,8 @@ namespace Tests.BackRoll.Services.Spotify
                 expectedUrl = url;
             }
 
-            var spotifyService = new SpotifyService(_spotifyClient, Mapper);
-
             // act
-            var track = await spotifyService.GetTrackByUrlAsync(url);
+            var track = await _sut.GetTrackByUrlAsync(url);
 
             // assert
             track.Name.Should().NotBeNullOrEmpty();
@@ -91,10 +92,8 @@ namespace Tests.BackRoll.Services.Spotify
         public void Match_HasSpotifyUrl_ShouldMatch(string url)
         {
             // arrange
-            var spotifyService = new SpotifyService(_spotifyClient, Mapper);
-
             // act
-            var result = spotifyService.Match(url);
+            var result = _sut.Match(url);
 
             // assert
             result.Should().BeTrue();
@@ -106,10 +105,8 @@ namespace Tests.BackRoll.Services.Spotify
         public void Match_DoNotHaveCorrectSpotifyUrl_ShouldNotMatch(string url)
         {
             // arrange
-            var spotifyService = new SpotifyService(_spotifyClient, Mapper);
-
             // act
-            var result = spotifyService.Match(url);
+            var result = _sut.Match(url);
 
             // assert
             result.Should().BeFalse();

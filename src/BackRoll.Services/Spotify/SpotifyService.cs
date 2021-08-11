@@ -15,7 +15,9 @@ namespace BackRoll.Services.Spotify
         private readonly SpotifyClient _spotifyClient;
         private readonly IMapper _mapper;
 
-        public StreamingService Name => StreamingService.Spotify;
+        public override StreamingService Name => StreamingService.Spotify;
+
+        public override string TrackUrlRegex => @"https:\/\/open\.spotify\.com\/track\/(?<trackid>[a-zA-Z0-9]+)";
 
         public SpotifyService(
             SpotifyClient spotifyClient,
@@ -25,9 +27,14 @@ namespace BackRoll.Services.Spotify
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<Track> FindTrackAsync(TrackSearchRequest request)
+        protected override async Task<Track> GetTrackByUrlInternalAsync(TrackUrlInfo trackUrlInfo)
         {
-            string query = BuildTrackSearchQuery(request);
+            var spotifyTrack = await _spotifyClient.Tracks.Get(trackUrlInfo.TrackId);
+            return Map(spotifyTrack);
+        }
+
+        protected override async Task<Track> FindTrackInternalAsync(TrackSearchRequest request, string query)
+        {
             var searchRequest = new SearchRequest(SearchRequest.Types.Track, query);
             var searchResponse = await _spotifyClient.Search.Item(searchRequest);
 
@@ -40,36 +47,6 @@ namespace BackRoll.Services.Spotify
             var track = Map(foundTrack);
 
             return track;
-        }
-
-        public async Task<Track> GetTrackByUrlAsync(string url)
-        {
-            Track track = null;
-            string id = GetId(url);
-            if (!string.IsNullOrEmpty(id))
-            {
-                var spotifyTrack = await _spotifyClient.Tracks.Get(id);
-                track = Map(spotifyTrack);
-            }
-
-            return track;
-        }
-
-        public bool Match(string url)
-        {
-            return !string.IsNullOrEmpty(GetId(url));
-        }
-
-        private static string GetId(string url)
-        {
-            string id = null;
-            var match = Regex.Match(url, @"https:\/\/open\.spotify\.com\/track\/(?<id>[a-zA-Z0-9]+)");
-            if (match.Success)
-            {
-                id = match.Groups["id"].Value;
-            }
-
-            return id;
         }
 
         private Track Map(FullTrack spotifyTrack)

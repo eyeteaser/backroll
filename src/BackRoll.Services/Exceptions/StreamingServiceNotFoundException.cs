@@ -4,22 +4,19 @@ namespace BackRoll.Services.Exceptions
 {
     public class StreamingServiceNotFoundException : BackRollException
     {
-        public const int MatchingServiceNotFound = 1;
-        public const int ServiceNotFound = 2;
-
-        protected StreamingServiceNotFoundException(int errorCode, string message)
-            : base(errorCode, message)
+        protected StreamingServiceNotFoundException(ErrorCode errorCode, string message, params object[] args)
+            : base(errorCode, message, args)
         {
         }
 
-        public static StreamingServiceNotFoundException MatchingServiceNotFoundException()
+        public static StreamingServiceNotFoundException MatchingServiceNotFound(string url)
         {
-            return new StreamingServiceNotFoundException(MatchingServiceNotFound, "Can't find matching streaming service");
+            return new StreamingServiceNotFoundException(ErrorCode.MatchingServiceNotFound, "Can't find matching streaming service for {Url}", url);
         }
 
-        public static StreamingServiceNotFoundException ServiceNotFoundException(StreamingService streamingService)
+        public static StreamingServiceNotFoundException ServiceNotFound(StreamingService streamingService)
         {
-            return new StreamingServiceNotFoundException(ServiceNotFound, $"Can't find {streamingService} streaming service with");
+            return new StreamingServiceNotFoundException(ErrorCode.ServiceNotFound, "Can't find {StreamingService} streaming service", streamingService);
         }
     }
 }

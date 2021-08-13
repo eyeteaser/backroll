@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace BackRoll.Telegram
@@ -7,7 +8,7 @@ namespace BackRoll.Telegram
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Configure().Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -15,6 +16,14 @@ namespace BackRoll.Telegram
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                });
+
+        public static IHostBuilder Configure(this IHostBuilder hostBuilder) =>
+            hostBuilder
+                .ConfigureServices((ctx, services) =>
+                {
+                    services.AddApplicationInsightsTelemetry(o =>
+                        o.ConnectionString = ctx.Configuration["APPINSIGHTS_CONNECTIONSTRING"]);
                 });
     }
 }

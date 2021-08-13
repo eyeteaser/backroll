@@ -3,6 +3,8 @@ using BackRoll.Services.Abstractions;
 using BackRoll.Services.Exceptions;
 using BackRoll.Telegram.Configuration;
 using BackRoll.Telegram.Exceptions;
+using BackRoll.Telegram.Extensions;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types;
 
 namespace BackRoll.Telegram.Scenes
@@ -11,13 +13,16 @@ namespace BackRoll.Telegram.Scenes
     {
         private readonly ITelegramUserConfiguration _telegramUserConfiguration;
         private readonly IStreamingManager _streamingManager;
+        private readonly ILogger _logger;
 
         public MessageScene(
             ITelegramUserConfiguration telegramUserConfiguration,
-            IStreamingManager streamingManager)
+            IStreamingManager streamingManager,
+            ILogger<MessageScene> logger)
         {
             _telegramUserConfiguration = telegramUserConfiguration;
             _streamingManager = streamingManager;
+            _logger = logger;
         }
 
         public override async Task<SceneResponse> ProcessAsync(Update update)
@@ -38,9 +43,15 @@ namespace BackRoll.Telegram.Scenes
             {
                 return SceneResponse.Fail("Please set your favorite streaming service.\n/setservice");
             }
-            catch (StreamingServiceNotFoundException)
+            catch (StreamingServiceNotFoundException e)
             {
+                _logger.LogInformation(e);
                 return SceneResponse.Fail("Please input correct link to streaming's track");
+            }
+            catch (TrackNotFoundException e)
+            {
+                _logger.LogInformation(e);
+                return SceneResponse.Fail("Sorry! Not found =(");
             }
         }
     }

@@ -18,10 +18,14 @@ namespace Tests.BackRoll.Services.Services
     {
         private readonly IServiceProvider _services;
 
+        private readonly StreamingManager _sut;
+
         public StreamingManagerTests(ConfigurationFixture configurationFixture, ITestOutputHelper testOutputHelper)
             : base(configurationFixture, testOutputHelper)
         {
             _services = configurationFixture.Services;
+
+            _sut = new StreamingManager(_services.GetService<IEnumerable<IStreamingService>>());
         }
 
         [Theory]
@@ -29,28 +33,24 @@ namespace Tests.BackRoll.Services.Services
         public void FindTrack_InvalidUrl_ShouldThrowException(string text)
         {
             // arrange
-            var streamingManager = new StreamingManager(_services.GetService<IEnumerable<IStreamingService>>());
-
             // act
-            Func<Task> act = () => streamingManager.FindTrackAsync(text, StreamingService.Undefined);
+            Func<Task> act = () => _sut.FindTrackAsync(text, StreamingService.Undefined);
 
             // assert
             act.Should().Throw<StreamingServiceNotFoundException>()
-                .Which.ErrorCode.Should().Be(StreamingServiceNotFoundException.MatchingServiceNotFound);
+                .Which.ErrorCode.Should().Be(ErrorCode.MatchingServiceNotFound);
         }
 
         [Fact]
         public void FindTrack_UnknownStreamingService_ShouldThrowException()
         {
             // arrange
-            var streamingManager = new StreamingManager(_services.GetService<IEnumerable<IStreamingService>>());
-
             // act
-            Func<Task> act = () => streamingManager.FindTrackAsync("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", StreamingService.Undefined);
+            Func<Task> act = () => _sut.FindTrackAsync("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", StreamingService.Undefined);
 
             // assert
             act.Should().Throw<StreamingServiceNotFoundException>()
-                .Which.ErrorCode.Should().Be(StreamingServiceNotFoundException.ServiceNotFound);
+                .Which.ErrorCode.Should().Be(ErrorCode.ServiceNotFound);
         }
 
         [Theory]
@@ -59,14 +59,25 @@ namespace Tests.BackRoll.Services.Services
         public async Task FindTrack_CorrectUrl_ShouldReturnTrack(string source, string target, StreamingService targetName)
         {
             // arrange
-            var streamingManager = new StreamingManager(_services.GetService<IEnumerable<IStreamingService>>());
-
             // act
-            var track = await streamingManager.FindTrackAsync(source, targetName);
+            var track = await _sut.FindTrackAsync(source, targetName);
 
             // assert
             track.Should().NotBeNull();
             track.Url.Should().Be(target);
+        }
+
+        [Theory]
+        [InlineData("https://music.yandex.ru/album/1234214214/track/12341242131")]
+        public void FindTrack_CorrectUrlFormatButInvalidTrackOrAlbumId_ShouldThrowException(string url)
+        {
+            // arrange
+            // act
+            Func<Task> act = () => _sut.FindTrackAsync(url, StreamingService.Spotify);
+
+            // assert
+            act.Should().Throw<TrackNotFoundException>()
+                .Which.ErrorCode.Should().Be(ErrorCode.TrackNotFoundByUrl);
         }
     }
 }

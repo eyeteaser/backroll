@@ -15,6 +15,7 @@ services:
         YandexMusic__ProxyUserName: ${YANDEXMUSIC_PROXYUSERNAME}
         YandexMusic__ProxyPassword: ${YANDEXMUSIC_PROXYPASSWORD}
     environment:
+      - APPINSIGHTS_CONNECTIONSTRING=${APPINSIGHTS_CONNECTIONSTRING}
       - Spotify__ClientId=${SPOTIFY_CLIENTID}
       - Spotify__ClientSecret=${SPOTIFY_CLIENTSECRET}
       - YandexMusic__UseProxy=${YANDEXMUSIC_USEPROXY}

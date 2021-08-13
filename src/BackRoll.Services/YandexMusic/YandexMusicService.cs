@@ -33,8 +33,15 @@ namespace BackRoll.Services.YandexMusic
 
         protected override async Task<Track> GetTrackByUrlInternalAsync(TrackUrlInfo trackUrlInfo)
         {
-            var yandexMusicTrack = (await _yandexMusicClient.Track.GetAsync(_authStorage, trackUrlInfo.TrackId)).Result.FirstOrDefault();
-            return Map(yandexMusicTrack, trackUrlInfo.AlbumId);
+            try
+            {
+                var yandexMusicTrack = (await _yandexMusicClient.Track.GetAsync(_authStorage, trackUrlInfo.TrackId)).Result.FirstOrDefault();
+                return Map(yandexMusicTrack, trackUrlInfo.AlbumId);
+            }
+            catch (WebException)
+            {
+                return null;
+            }
         }
 
         protected override async Task<Track> FindTrackInternalAsync(TrackSearchRequest request, string query)

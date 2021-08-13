@@ -29,7 +29,7 @@ namespace Tests.BackRoll.Telegram.Integration
 
         [Theory]
         [InlineData("https://music.yandex.ru/track/610031", "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT")]
-        public async Task Test(string source, string target)
+        public async Task Process_CorrectSourceUrl_ShouldReturnTargetServiceUrl(string source, string target)
         {
             // arrange
             var configuration = new TelegramUserConfigurationEntity()
@@ -55,6 +55,36 @@ namespace Tests.BackRoll.Telegram.Integration
             // assert
             response.IsOk.Should().BeTrue(response.Message);
             response.Message.Should().Be(target);
+        }
+
+        [Theory]
+        [InlineData("https://music.yandex.ru/album/1234214214/track/12341242131")]
+        public async Task Process_InvalidUrl_ShouldReturnNotFoundMessage(string source)
+        {
+            // arrange
+            var configuration = new TelegramUserConfigurationEntity()
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserId = 1,
+                StreamingService = StreamingService.Spotify,
+            };
+            _collection.Upsert(configuration);
+
+            var update = new Update()
+            {
+                Message = new Message()
+                {
+                    From = new User() { Id = configuration.UserId },
+                    Text = source,
+                },
+            };
+
+            // act
+            var response = await _scenesManager.ProcessAsync(update);
+
+            // assert
+            response.IsOk.Should().BeFalse(response.Message);
+            response.Message.Should().NotBeNullOrEmpty();
         }
     }
 }

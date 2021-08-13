@@ -1,15 +1,32 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace BackRoll.Services.Exceptions
 {
     public abstract class BackRollException : Exception
     {
-        public int ErrorCode { get; }
+        public ErrorCode ErrorCode { get; }
 
-        protected BackRollException(int errorCode, string message)
-            : base(message)
+        public object[] Args { get; }
+
+        public string MessageTemplate { get; }
+
+        protected BackRollException(ErrorCode errorCode, string message, params object[] args)
+            : base(Format(message, args))
         {
             ErrorCode = errorCode;
+            Args = args;
+            MessageTemplate = message;
+        }
+
+        private static string Format(string value, params object[] args)
+        {
+            int pos = 0;
+            var fmt = Regex.Replace(
+                value,
+                @"(?<={)[^}]+(?=})",
+                new MatchEvaluator(m => (pos++).ToString()));
+            return string.Format(fmt, args);
         }
     }
 }

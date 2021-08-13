@@ -117,6 +117,7 @@ namespace Tests.BackRoll.Services.YandexMusic
 
         [Theory]
         [InlineData("https://music.yandex.ru/album/67593/track/invalid")]
+        [InlineData("https://music.yandex.ru/album/1234214214/track/12341242131")]
         public async Task GetTrackByUrlAsync_IncorrectUrl_ShouldNotFindTrack(string text)
         {
             // arrange

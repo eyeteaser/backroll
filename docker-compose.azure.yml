@@ -4,6 +4,7 @@ services:
   backroll.telegram:
     image: alexvolchetsky/backroll:latest
     environment:
+      - APPINSIGHTS_CONNECTIONSTRING=${APPINSIGHTS_CONNECTIONSTRING}
       - Spotify__ClientId=${SPOTIFY_CLIENTID}
       - Spotify__ClientSecret=${SPOTIFY_CLIENTSECRET}
       - YandexMusic__UseProxy=${YANDEXMUSIC_USEPROXY}

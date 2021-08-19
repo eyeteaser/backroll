@@ -9,11 +9,13 @@ using Telegram.Bot.Types;
 
 namespace BackRoll.Telegram.Scenes
 {
-    public class MessageScene : Scene
+    public class MessageScene : IScene
     {
         private readonly ITelegramUserConfiguration _telegramUserConfiguration;
         private readonly IStreamingManager _streamingManager;
         private readonly ILogger _logger;
+
+        public SceneType SceneType => SceneType.Message;
 
         public MessageScene(
             ITelegramUserConfiguration telegramUserConfiguration,
@@ -25,7 +27,7 @@ namespace BackRoll.Telegram.Scenes
             _logger = logger;
         }
 
-        public override async Task<SceneResponse> ProcessAsync(Update update)
+        public async Task<SceneResponse> ProcessAsync(Update update)
         {
             try
             {
@@ -41,7 +43,7 @@ namespace BackRoll.Telegram.Scenes
             }
             catch (TelegramUserConfigurationNotFoundException)
             {
-                return SceneResponse.Fail("Please set your favorite streaming service.\n/setservice");
+                return SceneResponse.Redirect(SceneType.SetService);
             }
             catch (StreamingServiceNotFoundException e)
             {

@@ -20,8 +20,8 @@ namespace BackRoll.Telegram.Bot
             services.AddSingleton<ITelegramUserConfigurationRepository, TelegramUserConfigurationRepository>();
             services.AddSingleton(p => DbContextFactory.Create(p.GetRequiredService<IOptions<TelegramBotConfig>>().Value.DbConnectionString));
 
-            services.AddSingleton<MessageScene>();
-            services.AddSingleton<SetServiceScene>();
+            services.AddSingleton<IScene, MessageScene>();
+            services.AddSingleton<IScene, SetServiceScene>();
             services.AddSingleton<IScenesManager, ScenesManager>();
 
             return services;

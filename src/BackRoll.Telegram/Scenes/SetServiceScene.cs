@@ -8,18 +8,20 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BackRoll.Telegram.Scenes
 {
-    public class SetServiceScene : Scene
+    public class SetServiceScene : IScene
     {
         public const string CommandPrefix = "/setservice";
         private const string _streamingDataRegex = CommandPrefix + @"_(?<service>\w+)";
         private readonly ITelegramUserConfiguration _telegramUserConfiguration;
+
+        public SceneType SceneType => SceneType.SetService;
 
         public SetServiceScene(ITelegramUserConfiguration telegramUserConfiguration)
         {
             _telegramUserConfiguration = telegramUserConfiguration;
         }
 
-        public override Task<SceneResponse> ProcessAsync(Update update)
+        public Task<SceneResponse> ProcessAsync(Update update)
         {
             if (update.CallbackQuery != null && TryParseStreamingData(update.CallbackQuery.Data, out StreamingService streamingService))
             {

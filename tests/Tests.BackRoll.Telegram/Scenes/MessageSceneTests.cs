@@ -25,7 +25,7 @@ namespace Tests.BackRoll.Telegram.Scenes
         }
 
         [Fact]
-        public async Task Process_UserDoNotHaveConfiguration_ShouldReturnFailedResponse()
+        public async Task Process_UserDoNotHaveConfiguration_ShouldReturnRedirectToSetServiceScene()
         {
             // arrange
             var update = new Update()
@@ -46,7 +46,8 @@ namespace Tests.BackRoll.Telegram.Scenes
             var response = await messageScene.ProcessAsync(update);
 
             // assert
-            response.IsOk.Should().BeFalse();
+            response.Status.Should().Be(SceneResponseStatus.Redirect);
+            response.SceneToRedirect.Should().Be(SceneType.SetService);
         }
     }
 }

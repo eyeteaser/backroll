@@ -53,7 +53,7 @@ namespace Tests.BackRoll.Telegram.Integration
             var response = await _scenesManager.ProcessAsync(update);
 
             // assert
-            response.IsOk.Should().BeTrue(response.Message);
+            response.Status.Should().Be(SceneResponseStatus.Ok, response.Message);
             response.Message.Should().Be(target);
         }
 
@@ -83,7 +83,7 @@ namespace Tests.BackRoll.Telegram.Integration
             var response = await _scenesManager.ProcessAsync(update);
 
             // assert
-            response.IsOk.Should().BeFalse(response.Message);
+            response.Status.Should().Be(SceneResponseStatus.Fail, response.Message);
             response.Message.Should().NotBeNullOrEmpty();
         }
     }

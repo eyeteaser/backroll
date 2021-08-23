@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using BackRoll.Services.Abstractions;
 using BackRoll.Services.Models;
 using BackRoll.Telegram.Configuration;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BackRoll.Telegram.Scenes
@@ -13,20 +13,28 @@ namespace BackRoll.Telegram.Scenes
         public const string CommandPrefix = "/setservice";
         private const string _streamingDataRegex = CommandPrefix + @"_(?<service>\w+)";
         private readonly ITelegramUserConfiguration _telegramUserConfiguration;
+        private readonly ISessionService _sessionService;
 
         public SceneType SceneType => SceneType.SetService;
 
-        public SetServiceScene(ITelegramUserConfiguration telegramUserConfiguration)
+        public SetServiceScene(
+            ITelegramUserConfiguration telegramUserConfiguration,
+            ISessionService sessionService)
         {
             _telegramUserConfiguration = telegramUserConfiguration;
+            _sessionService = sessionService;
         }
 
-        public Task<SceneResponse> ProcessAsync(Update update)
+        public Task<SceneResponse> ProcessAsync(TelegramMessage message)
         {
-            if (update.CallbackQuery != null && TryParseStreamingData(update.CallbackQuery.Data, out StreamingService streamingService))
+            if (message.Text.StartsWith(CommandPrefix) && TryParseStreamingData(message.Text, out StreamingService streamingService))
             {
-                _telegramUserConfiguration.SetStreamingService(update.CallbackQuery.From, streamingService);
-                return Task.FromResult(SceneResponse.Ok($"I will remember that you like {GetStreamingPrettyName(streamingService)}"));
+                _telegramUserConfiguration.SetStreamingService(message.From, streamingService);
+                var lastRequest = _sessionService.GetAndDeleteLastRequest(message.From.Id);
+                var chainedScene = lastRequest != null ? SceneType.Message : SceneType.Undefined;
+                message.Text = lastRequest;
+                var response = SceneResponse.Ok($"I will remember that you like {GetStreamingPrettyName(streamingService)}", chainWith: chainedScene);
+                return Task.FromResult(response);
             }
 
             var buttons = new InlineKeyboardButton[]

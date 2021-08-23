@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Telegram.Bot.Types;
 
 namespace BackRoll.Telegram.Scenes
 {
@@ -7,6 +6,6 @@ namespace BackRoll.Telegram.Scenes
     {
         SceneType SceneType { get; }
 
-        Task<SceneResponse> ProcessAsync(Update update);
+        Task<SceneResponse> ProcessAsync(TelegramMessage message);
     }
 }

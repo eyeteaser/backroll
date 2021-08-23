@@ -5,7 +5,6 @@ using BackRoll.Telegram.Configuration;
 using BackRoll.Telegram.Exceptions;
 using BackRoll.Telegram.Extensions;
 using Microsoft.Extensions.Logging;
-using Telegram.Bot.Types;
 
 namespace BackRoll.Telegram.Scenes
 {
@@ -13,6 +12,7 @@ namespace BackRoll.Telegram.Scenes
     {
         private readonly ITelegramUserConfiguration _telegramUserConfiguration;
         private readonly IStreamingManager _streamingManager;
+        private readonly ISessionService _sessionService;
         private readonly ILogger _logger;
 
         public SceneType SceneType => SceneType.Message;
@@ -20,19 +20,21 @@ namespace BackRoll.Telegram.Scenes
         public MessageScene(
             ITelegramUserConfiguration telegramUserConfiguration,
             IStreamingManager streamingManager,
+            ISessionService sessionService,
             ILogger<MessageScene> logger)
         {
             _telegramUserConfiguration = telegramUserConfiguration;
             _streamingManager = streamingManager;
+            _sessionService = sessionService;
             _logger = logger;
         }
 
-        public async Task<SceneResponse> ProcessAsync(Update update)
+        public async Task<SceneResponse> ProcessAsync(TelegramMessage message)
         {
             try
             {
-                var configuration = _telegramUserConfiguration.GetConfiguration(update.Message.From);
-                var track = await _streamingManager.FindTrackAsync(update.Message.Text, configuration.StreamingService);
+                var configuration = _telegramUserConfiguration.GetConfiguration(message.From);
+                var track = await _streamingManager.FindTrackAsync(message.Text, configuration.StreamingService);
                 var text = track?.Url;
                 if (!string.IsNullOrEmpty(text))
                 {
@@ -43,7 +45,8 @@ namespace BackRoll.Telegram.Scenes
             }
             catch (TelegramUserConfigurationNotFoundException)
             {
-                return SceneResponse.Redirect(SceneType.SetService);
+                _sessionService.SetLastRequest(message.From.Id, message.Text);
+                return SceneResponse.Fail(chainWith: SceneType.SetService);
             }
             catch (StreamingServiceNotFoundException e)
             {

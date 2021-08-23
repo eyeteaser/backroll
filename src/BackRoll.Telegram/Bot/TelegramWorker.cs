@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
-using UpdateType = Telegram.Bot.Types.Enums.UpdateType;
+using Telegram.Bot.Types.Enums;
 
 namespace BackRoll.Telegram.Bot
 {
@@ -38,8 +38,11 @@ namespace BackRoll.Telegram.Bot
                 Chat chat = GetChat(update);
                 try
                 {
-                    var response = await _scenesManager.ProcessAsync(update);
-                    await _botClient.SendTextMessageAsync(chat, response.Message, cancellationToken: stoppingToken, replyMarkup: response.ReplyMarkup);
+                    var response = await _scenesManager.ProcessAsync(GetMessage(update));
+                    foreach (var message in response.Messages)
+                    {
+                        await _botClient.SendTextMessageAsync(chat, message.Text, cancellationToken: stoppingToken, replyMarkup: message.ReplyMarkup);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -47,6 +50,16 @@ namespace BackRoll.Telegram.Bot
                     _logger.LogError(ex, ex.Message);
                 }
             }
+        }
+
+        private static TelegramMessage GetMessage(Update update)
+        {
+            return update.Type switch
+            {
+                UpdateType.Message => new TelegramMessage(update.Message.From, update.Message.Text),
+                UpdateType.CallbackQuery => new TelegramMessage(update.CallbackQuery.From, update.CallbackQuery.Data),
+                _ => null,
+            };
         }
 
         private static Chat GetChat(Update update)

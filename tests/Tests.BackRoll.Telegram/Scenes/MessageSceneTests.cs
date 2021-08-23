@@ -15,12 +15,14 @@ namespace Tests.BackRoll.Telegram.Scenes
     {
         private readonly Mock<ITelegramUserConfiguration> _mockTelegramUserConfiguration;
         private readonly Mock<IStreamingManager> _mockStreamingManager;
+        private readonly Mock<ISessionService> _mockSessionService;
         private readonly Mock<ILogger<MessageScene>> _mockLogger;
 
         public MessageSceneTests()
         {
             _mockTelegramUserConfiguration = new Mock<ITelegramUserConfiguration>();
             _mockStreamingManager = new Mock<IStreamingManager>();
+            _mockSessionService = new Mock<ISessionService>();
             _mockLogger = new Mock<ILogger<MessageScene>>();
         }
 
@@ -28,9 +30,12 @@ namespace Tests.BackRoll.Telegram.Scenes
         public async Task Process_UserDoNotHaveConfiguration_ShouldReturnRedirectToSetServiceScene()
         {
             // arrange
-            var update = new Update()
+            var message = new TelegramMessage()
             {
-                Message = new Message(),
+                From = new User()
+                {
+                    Id = 1,
+                },
             };
 
             _mockTelegramUserConfiguration
@@ -40,14 +45,15 @@ namespace Tests.BackRoll.Telegram.Scenes
             var messageScene = new MessageScene(
                 _mockTelegramUserConfiguration.Object,
                 _mockStreamingManager.Object,
+                _mockSessionService.Object,
                 _mockLogger.Object);
 
             // act
-            var response = await messageScene.ProcessAsync(update);
+            var response = await messageScene.ProcessAsync(message);
 
             // assert
-            response.Status.Should().Be(SceneResponseStatus.Redirect);
-            response.SceneToRedirect.Should().Be(SceneType.SetService);
+            response.IsOk.Should().BeFalse();
+            response.ChainWith.Should().Be(SceneType.SetService);
         }
     }
 }

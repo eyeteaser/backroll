@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Telegram.Bot.Types;
 
 namespace BackRoll.Telegram.Scenes
 {
@@ -14,17 +13,27 @@ namespace BackRoll.Telegram.Scenes
             _scenes = scenes;
         }
 
-        public async Task<SceneResponse> ProcessAsync(Update update)
+        public async Task<TelegramResponse> ProcessAsync(TelegramMessage message)
         {
-            var data = GetData(update);
-            var sceneType = GetSceneType(data);
-            var result = await GetScene(sceneType).ProcessAsync(update);
-            if (result.Status == SceneResponseStatus.Redirect)
+            var sceneType = GetSceneType(message.Text);
+
+            var result = new TelegramResponse
             {
-                result = await GetScene(result.SceneToRedirect).ProcessAsync(update);
-            }
+                Messages = new List<TelegramResponseMessage>(),
+            };
+
+            await ProcessRecursiveAsync(message, sceneType, result);
 
             return result;
+        }
+
+        private static TelegramResponseMessage Map(SceneResponse sceneResponse)
+        {
+            return new TelegramResponseMessage()
+            {
+                Text = sceneResponse.Message,
+                ReplyMarkup = sceneResponse.ReplyMarkup,
+            };
         }
 
         private static SceneType GetSceneType(string data)
@@ -37,24 +46,23 @@ namespace BackRoll.Telegram.Scenes
             return SceneType.Message;
         }
 
-        private static string GetData(Update update)
-        {
-            if (update.CallbackQuery != null)
-            {
-                return update.CallbackQuery.Data;
-            }
-
-            if (update.Message != null)
-            {
-                return update.Message.Text;
-            }
-
-            return null;
-        }
-
         private IScene GetScene(SceneType sceneType)
         {
             return _scenes.FirstOrDefault(x => x.SceneType == sceneType);
+        }
+
+        private async Task ProcessRecursiveAsync(TelegramMessage message, SceneType sceneType, TelegramResponse telegramResponse)
+        {
+            var sceneResponse = await GetScene(sceneType).ProcessAsync(message);
+            if (!string.IsNullOrEmpty(sceneResponse.Message))
+            {
+                telegramResponse.Messages.Add(Map(sceneResponse));
+            }
+
+            if (sceneResponse.ChainWith != SceneType.Undefined)
+            {
+                await ProcessRecursiveAsync(message, sceneResponse.ChainWith, telegramResponse);
+            }
         }
     }
 }

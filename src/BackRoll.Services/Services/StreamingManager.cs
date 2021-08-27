@@ -31,6 +31,11 @@ namespace BackRoll.Services.Services
                 throw StreamingServiceNotFoundException.ServiceNotFound(streamingService);
             }
 
+            if (sourceStreamingService == targetStreamingService)
+            {
+                throw SameStreamingServiceException.Get(streamingService);
+            }
+
             var originalTrack = await sourceStreamingService.GetTrackByUrlAsync(url);
             if (originalTrack == null)
             {

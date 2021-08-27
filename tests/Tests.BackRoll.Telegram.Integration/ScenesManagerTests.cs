@@ -145,5 +145,80 @@ namespace Tests.BackRoll.Telegram.Integration
             response.Messages.Should().HaveCount(2);
             response.Messages[1].Text.Should().Be(target);
         }
+
+        [Theory]
+        [InlineData("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT")]
+        public async Task Process_HasSpotifyAsFavoriteServiceAndSendsSpotifyLink_ShouldSuggestOtherPlatformsToGetLink(string source)
+        {
+            // arrange
+            var user = new User() { Id = 1 };
+            var configuration = new TelegramUserConfigurationEntity()
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserId = user.Id,
+                StreamingService = StreamingService.Spotify,
+            };
+            _collection.Upsert(configuration);
+            var message = new TelegramMessage()
+            {
+                From = user,
+                Text = source,
+            };
+
+            // act
+            var response = await _scenesManager.ProcessAsync(message);
+
+            // assert
+            response.Messages.Should().HaveCount(1);
+            var responseMessage = response.Messages.First();
+            responseMessage.ReplyMarkup.Should().NotBeNull(responseMessage.Text)
+                .And.BeOfType<InlineKeyboardMarkup>();
+
+            var markup = responseMessage.ReplyMarkup as InlineKeyboardMarkup;
+            markup.InlineKeyboard.Should().HaveCount(1);
+
+            var keyboardButtons = markup.InlineKeyboard.First();
+            keyboardButtons.Should().OnlyContain(x => x.CallbackData.StartsWith("/message_"));
+            keyboardButtons.Should().OnlyContain(x => !x.CallbackData.StartsWith("/message_Spotify"));
+            keyboardButtons.Should().Contain(x => x.CallbackData == "/message_YandexMusic");
+        }
+
+        [Theory]
+        [InlineData("https://open.spotify.com/track/2r1ObHripAsIgOZ0rRwJBy", "https://music.yandex.ru/album/7113863/track/51143747")]
+        public async Task Process_HasSpotifyAsFavoriteServiceAndSendsSpotifyLinkAndConvertsItToYandexMusic_ShouldReturnCorrectLink(string source, string target)
+        {
+            // arrange
+            var user = new User() { Id = 1 };
+            var configuration = new TelegramUserConfigurationEntity()
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserId = user.Id,
+                StreamingService = StreamingService.Spotify,
+            };
+            _collection.Upsert(configuration);
+            var message = new TelegramMessage()
+            {
+                From = user,
+                Text = source,
+            };
+
+            var response = await _scenesManager.ProcessAsync(message);
+            string callbackData = (response.Messages.First().ReplyMarkup as InlineKeyboardMarkup)
+                .InlineKeyboard.First().First(x => x.CallbackData == "/message_YandexMusic").CallbackData;
+
+            var callback = new TelegramMessage()
+            {
+                From = user,
+                Text = callbackData,
+            };
+
+            // act
+            response = await _scenesManager.ProcessAsync(callback);
+
+            // assert
+            response.Messages.Should().HaveCount(1);
+            var responseMessage = response.Messages.First();
+            responseMessage.Text.Should().Be(target);
+        }
     }
 }

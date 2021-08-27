@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using BackRoll.Services.Abstractions;
 using BackRoll.Services.Exceptions;
+using BackRoll.Services.Models;
+using BackRoll.Telegram.Bot;
 using BackRoll.Telegram.Configuration;
 using BackRoll.Telegram.Exceptions;
 using BackRoll.Telegram.Extensions;
@@ -10,9 +12,12 @@ namespace BackRoll.Telegram.Scenes
 {
     public class MessageScene : IScene
     {
+        public const string CommandPrefix = "/message";
+
         private readonly ITelegramUserConfiguration _telegramUserConfiguration;
         private readonly IStreamingManager _streamingManager;
         private readonly ISessionService _sessionService;
+        private readonly IStreamingHelper _streamingHelper;
         private readonly ILogger _logger;
 
         public SceneType SceneType => SceneType.Message;
@@ -21,11 +26,13 @@ namespace BackRoll.Telegram.Scenes
             ITelegramUserConfiguration telegramUserConfiguration,
             IStreamingManager streamingManager,
             ISessionService sessionService,
+            IStreamingHelper streamingHelper,
             ILogger<MessageScene> logger)
         {
             _telegramUserConfiguration = telegramUserConfiguration;
             _streamingManager = streamingManager;
             _sessionService = sessionService;
+            _streamingHelper = streamingHelper;
             _logger = logger;
         }
 
@@ -33,12 +40,24 @@ namespace BackRoll.Telegram.Scenes
         {
             try
             {
-                var configuration = _telegramUserConfiguration.GetConfiguration(message.From);
-                var track = await _streamingManager.FindTrackAsync(message.Text, configuration.StreamingService);
-                var text = track?.Url;
-                if (!string.IsNullOrEmpty(text))
+                string text;
+                if (message.Text.StartsWith(CommandPrefix)
+                    && _streamingHelper.TryParseStreamingData(CommandPrefix, message.Text, out StreamingService streamingService))
                 {
-                    return SceneResponse.Ok(text);
+                    text = _sessionService.GetAndDeleteLastRequest(message.From.Id);
+                }
+                else
+                {
+                    var configuration = _telegramUserConfiguration.GetConfiguration(message.From);
+                    streamingService = configuration.StreamingService;
+                    text = message.Text;
+                }
+
+                var track = await _streamingManager.FindTrackAsync(text, streamingService);
+                var responseText = track?.Url;
+                if (!string.IsNullOrEmpty(responseText))
+                {
+                    return SceneResponse.Ok(responseText);
                 }
 
                 return SceneResponse.Fail("Sorry! Not found =(");
@@ -52,6 +71,13 @@ namespace BackRoll.Telegram.Scenes
             {
                 _logger.LogInformation(e);
                 return SceneResponse.Fail("Please input correct link to streaming's track");
+            }
+            catch (SameStreamingServiceException e)
+            {
+                _sessionService.SetLastRequest(message.From.Id, message.Text);
+                return SceneResponse.Fail(
+                    $"This is already {_streamingHelper.GetStreamingPrettyName(e.StreamingService)} link.\nMaybe you want to convert it to other platform link?",
+                    _streamingHelper.CreateStreamingButtonsMarkup(CommandPrefix, e.StreamingService));
             }
             catch (TrackNotFoundException e)
             {

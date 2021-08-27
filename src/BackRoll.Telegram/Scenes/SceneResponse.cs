@@ -25,9 +25,9 @@ namespace BackRoll.Telegram.Scenes
             return new SceneResponse(message, true, replyMarkup, chainWith);
         }
 
-        public static SceneResponse Fail(string message = null, SceneType chainWith = SceneType.Undefined)
+        public static SceneResponse Fail(string message = null, IReplyMarkup replyMarkup = null, SceneType chainWith = SceneType.Undefined)
         {
-            return new SceneResponse(message, false, null, chainWith);
+            return new SceneResponse(message, false, replyMarkup, chainWith);
         }
     }
 }

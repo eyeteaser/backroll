@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using BackRoll.Services.Abstractions;
+using BackRoll.Telegram.Bot;
 using BackRoll.Telegram.Configuration;
 using BackRoll.Telegram.Exceptions;
 using BackRoll.Telegram.Scenes;
@@ -16,6 +17,7 @@ namespace Tests.BackRoll.Telegram.Scenes
         private readonly Mock<ITelegramUserConfiguration> _mockTelegramUserConfiguration;
         private readonly Mock<IStreamingManager> _mockStreamingManager;
         private readonly Mock<ISessionService> _mockSessionService;
+        private readonly Mock<IStreamingHelper> _mockStreamingHelper;
         private readonly Mock<ILogger<MessageScene>> _mockLogger;
 
         public MessageSceneTests()
@@ -23,6 +25,7 @@ namespace Tests.BackRoll.Telegram.Scenes
             _mockTelegramUserConfiguration = new Mock<ITelegramUserConfiguration>();
             _mockStreamingManager = new Mock<IStreamingManager>();
             _mockSessionService = new Mock<ISessionService>();
+            _mockStreamingHelper = new Mock<IStreamingHelper>();
             _mockLogger = new Mock<ILogger<MessageScene>>();
         }
 
@@ -36,6 +39,7 @@ namespace Tests.BackRoll.Telegram.Scenes
                 {
                     Id = 1,
                 },
+                Text = "any",
             };
 
             _mockTelegramUserConfiguration
@@ -46,6 +50,7 @@ namespace Tests.BackRoll.Telegram.Scenes
                 _mockTelegramUserConfiguration.Object,
                 _mockStreamingManager.Object,
                 _mockSessionService.Object,
+                _mockStreamingHelper.Object,
                 _mockLogger.Object);
 
             // act

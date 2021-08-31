@@ -40,6 +40,7 @@ namespace BackRoll.Telegram.Scenes
         {
             try
             {
+                var user = _telegramUserService.GetUser(message.From);
                 string text;
                 if (message.Text.StartsWith(CommandPrefix)
                     && _streamingHelper.TryParseStreamingData(CommandPrefix, message.Text, out StreamingService streamingService))
@@ -48,19 +49,20 @@ namespace BackRoll.Telegram.Scenes
                 }
                 else
                 {
-                    var configuration = _telegramUserService.GetUser(message.From);
-                    streamingService = configuration.StreamingService;
+                    streamingService = user.StreamingService;
                     text = message.Text;
                 }
 
                 var track = await _streamingManager.FindTrackAsync(text, streamingService);
-                var responseText = track?.Url;
-                if (!string.IsNullOrEmpty(responseText))
+
+                SceneType chainWith = SceneType.Undefined;
+                if (user.IsNew)
                 {
-                    return SceneResponse.Ok(responseText);
+                    _telegramUserService.SetNotNew(message.From);
+                    chainWith = SceneType.Configured;
                 }
 
-                return SceneResponse.Fail("Sorry! Not found =(");
+                return SceneResponse.Ok(track.Url, chainWith: chainWith);
             }
             catch (TelegramUserNotFoundException)
             {

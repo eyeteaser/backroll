@@ -9,5 +9,7 @@ namespace BackRoll.Telegram.Configuration
         TelegramUserModel GetUser(User user);
 
         void SetStreamingService(User user, StreamingService streamingService);
+
+        void SetNotNew(User user);
     }
 }

@@ -44,7 +44,7 @@ namespace BackRoll.Services.Services
 
             var request = CreateRequest(originalTrack);
             var track = await targetStreamingService.FindTrackAsync(request);
-            if (track == null)
+            if (track == null || string.IsNullOrEmpty(track.Url))
             {
                 throw TrackNotFoundException.TrackNotFoundByQuery(targetStreamingService.Name, request);
             }

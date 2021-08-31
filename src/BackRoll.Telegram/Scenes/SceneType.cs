@@ -3,6 +3,8 @@
     public enum SceneType
     {
         Undefined,
+        Start,
+        Configured,
         Message,
         SetService,
     }

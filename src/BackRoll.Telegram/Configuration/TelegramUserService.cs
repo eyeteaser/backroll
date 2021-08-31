@@ -33,7 +33,25 @@ namespace BackRoll.Telegram.Configuration
             return new TelegramUserModel()
             {
                 StreamingService = telegramUser.StreamingService,
+                IsNew = telegramUser.IsNew,
             };
+        }
+
+        public void SetNotNew(User user)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            var telegramUser = _telegramUserRepository.FindByUserId(user.Id);
+            if (telegramUser == null)
+            {
+                throw new TelegramUserNotFoundException(user);
+            }
+
+            telegramUser.IsNew = false;
+            _telegramUserRepository.Upsert(telegramUser);
         }
 
         public void SetStreamingService(User user, StreamingService streamingService)
@@ -48,19 +66,20 @@ namespace BackRoll.Telegram.Configuration
                 throw new ArgumentException($"{streamingService} is not allowed value", nameof(streamingService));
             }
 
-            var configuration = _telegramUserRepository.FindByUserId(user.Id);
-            if (configuration == null)
+            var telegramUser = _telegramUserRepository.FindByUserId(user.Id);
+            if (telegramUser == null)
             {
-                configuration = new TelegramUserEntity()
+                telegramUser = new TelegramUserEntity()
                 {
                     Id = Guid.NewGuid().ToString(),
                     UserId = user.Id,
+                    IsNew = true,
                 };
             }
 
-            configuration.StreamingService = streamingService;
+            telegramUser.StreamingService = streamingService;
 
-            _telegramUserRepository.Upsert(configuration);
+            _telegramUserRepository.Upsert(telegramUser);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,6 +39,11 @@ namespace BackRoll.Telegram.Scenes
 
         private static SceneType GetSceneType(string data)
         {
+            if (string.Equals(data, StartScene.Command, StringComparison.OrdinalIgnoreCase))
+            {
+                return SceneType.Start;
+            }
+
             if (data.StartsWith(SetServiceScene.CommandPrefix))
             {
                 return SceneType.SetService;

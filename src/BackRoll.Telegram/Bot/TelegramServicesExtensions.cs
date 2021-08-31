@@ -22,6 +22,8 @@ namespace BackRoll.Telegram.Bot
 
             services.AddSingleton<IStreamingHelper, StreamingHelper>();
 
+            services.AddSingleton<IScene, StartScene>();
+            services.AddSingleton<IScene, ConfiguredScene>();
             services.AddSingleton<IScene, MessageScene>();
             services.AddSingleton<IScene, SetServiceScene>();
             services.AddSingleton<IScenesManager, ScenesManager>();

@@ -143,7 +143,7 @@ namespace Tests.BackRoll.Telegram.Integration
             response = await _scenesManager.ProcessAsync(callback);
 
             // assert
-            response.Messages.Should().HaveCount(2);
+            response.Messages.Should().HaveCount(3);
             response.Messages[1].Text.Should().Be(target);
         }
 
@@ -220,6 +220,138 @@ namespace Tests.BackRoll.Telegram.Integration
             response.Messages.Should().HaveCount(1);
             var responseMessage = response.Messages.First();
             responseMessage.Text.Should().Be(target);
+        }
+
+        [Fact]
+        public async Task Process_StartScene_ShouldReturnWelcomeMessage()
+        {
+            // arrange
+            var user = new User() { Id = 1 };
+            var message = new TelegramMessage()
+            {
+                From = user,
+                Text = "/start",
+            };
+
+            // act
+            var response = await _scenesManager.ProcessAsync(message);
+
+            // assert
+            response.Messages.Should().HaveCount(1);
+            var responseMessage = response.Messages.First();
+            responseMessage.ReplyMarkup.Should().NotBeNull()
+                .And.BeOfType<ReplyKeyboardMarkup>();
+        }
+
+        [Fact]
+        public async Task Process_StartSceneAndSendTrackUrl_ShouldAskToSetFavoriteService()
+        {
+            // arrange
+            var user = new User() { Id = 1 };
+            var startMessage = new TelegramMessage()
+            {
+                From = user,
+                Text = "/start",
+            };
+            var response = await _scenesManager.ProcessAsync(startMessage);
+            string trackUrl = (response.Messages.First().ReplyMarkup as ReplyKeyboardMarkup).Keyboard.First().First().Text;
+            var message = new TelegramMessage()
+            {
+                From = user,
+                Text = trackUrl,
+            };
+
+            // act
+            response = await _scenesManager.ProcessAsync(message);
+
+            // assert
+            response.Messages.Should().HaveCount(1);
+            var responseMessage = response.Messages.First();
+            responseMessage.ReplyMarkup.Should().NotBeNull()
+                .And.BeOfType<InlineKeyboardMarkup>();
+            var markup = responseMessage.ReplyMarkup as InlineKeyboardMarkup;
+            markup.InlineKeyboard.First().Should().Contain(x => x.CallbackData == "/setservice_YandexMusic");
+        }
+
+        [Fact]
+        public async Task Process_StartSceneAndSendTrackUrlAndConfigureFavoriteService_ShouldReturnTrackUrlAndFinalConfigurationMessage()
+        {
+            // arrange
+            var user = new User() { Id = 1 };
+            var startMessage = new TelegramMessage()
+            {
+                From = user,
+                Text = "/start",
+            };
+            var response = await _scenesManager.ProcessAsync(startMessage);
+
+            string trackUrl = (response.Messages.First().ReplyMarkup as ReplyKeyboardMarkup).Keyboard.First().First().Text;
+            var trackMessage = new TelegramMessage()
+            {
+                From = user,
+                Text = trackUrl,
+            };
+            response = await _scenesManager.ProcessAsync(trackMessage);
+
+            string callbackData = (response.Messages.First().ReplyMarkup as InlineKeyboardMarkup)
+                .InlineKeyboard.First().First(x => x.CallbackData == "/setservice_YandexMusic").CallbackData;
+            var message = new TelegramMessage()
+            {
+                From = user,
+                Text = callbackData,
+            };
+
+            // act
+            response = await _scenesManager.ProcessAsync(message);
+
+            // assert
+            response.Messages.Should().HaveCount(3);
+
+            var favoriteServiceMessage = response.Messages.First();
+            favoriteServiceMessage.Text.Should().NotBeNullOrEmpty();
+
+            var trackResponseMessage = response.Messages[1];
+            trackResponseMessage.Text.Should().NotBeNullOrEmpty();
+
+            var finishedConfigurationMessage = response.Messages[2];
+            finishedConfigurationMessage.Text.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task Process_StartSceneAndSendTrackUrlAndConfigureFavoriteServiceAndSendOneMoreMessage_ShouldReturnOnlyOneMessage()
+        {
+            // arrange
+            var user = new User() { Id = 1 };
+            var startMessage = new TelegramMessage()
+            {
+                From = user,
+                Text = "/start",
+            };
+            var response = await _scenesManager.ProcessAsync(startMessage);
+
+            string trackUrl = (response.Messages.First().ReplyMarkup as ReplyKeyboardMarkup).Keyboard.First().First().Text;
+            var trackMessage = new TelegramMessage()
+            {
+                From = user,
+                Text = trackUrl,
+            };
+            response = await _scenesManager.ProcessAsync(trackMessage);
+
+            string callbackData = (response.Messages.First().ReplyMarkup as InlineKeyboardMarkup)
+                .InlineKeyboard.First().First(x => x.CallbackData == "/setservice_YandexMusic").CallbackData;
+            var message = new TelegramMessage()
+            {
+                From = user,
+                Text = callbackData,
+            };
+
+            await _scenesManager.ProcessAsync(message);
+
+            // act
+            response = await _scenesManager.ProcessAsync(trackMessage);
+
+            // assert
+            response.Messages.Should().HaveCount(1);
         }
     }
 }

@@ -2,7 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BackRoll.Services.Models;
-using BackRoll.Telegram.Data.Entities;
+using BackRoll.Telegram.Database.Entities;
+using BackRoll.Telegram.Database.Repositories;
 using BackRoll.Telegram.Scenes;
 using FluentAssertions;
 using LiteDB;
@@ -18,14 +19,14 @@ namespace Tests.BackRoll.Telegram.Integration
     public class ScenesManagerTests
     {
         private readonly IScenesManager _scenesManager;
-        private readonly ILiteCollection<TelegramUserConfigurationEntity> _collection;
+        private readonly ILiteCollection<TelegramUserEntity> _collection;
 
         public ScenesManagerTests(MainFixture mainFixture)
         {
             _scenesManager = mainFixture.Services.GetService<IScenesManager>();
 
             var db = mainFixture.Services.GetService<LiteDatabase>();
-            _collection = db.GetCollection<TelegramUserConfigurationEntity>("UserConfigurations");
+            _collection = db.GetCollection<TelegramUserEntity>(TelegramUserRepository.CollectionName);
             _collection.DeleteAll();
         }
 
@@ -34,7 +35,7 @@ namespace Tests.BackRoll.Telegram.Integration
         public async Task Process_CorrectSourceUrl_ShouldReturnTargetServiceUrl(string source, string target)
         {
             // arrange
-            var configuration = new TelegramUserConfigurationEntity()
+            var configuration = new TelegramUserEntity()
             {
                 Id = Guid.NewGuid().ToString(),
                 UserId = 1,
@@ -61,7 +62,7 @@ namespace Tests.BackRoll.Telegram.Integration
         public async Task Process_InvalidUrl_ShouldReturnNotFoundMessage(string source)
         {
             // arrange
-            var configuration = new TelegramUserConfigurationEntity()
+            var configuration = new TelegramUserEntity()
             {
                 Id = Guid.NewGuid().ToString(),
                 UserId = 1,
@@ -152,7 +153,7 @@ namespace Tests.BackRoll.Telegram.Integration
         {
             // arrange
             var user = new User() { Id = 1 };
-            var configuration = new TelegramUserConfigurationEntity()
+            var configuration = new TelegramUserEntity()
             {
                 Id = Guid.NewGuid().ToString(),
                 UserId = user.Id,
@@ -189,7 +190,7 @@ namespace Tests.BackRoll.Telegram.Integration
         {
             // arrange
             var user = new User() { Id = 1 };
-            var configuration = new TelegramUserConfigurationEntity()
+            var configuration = new TelegramUserEntity()
             {
                 Id = Guid.NewGuid().ToString(),
                 UserId = user.Id,

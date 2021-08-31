@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using LiteDB;
 
-namespace BackRoll.Telegram.Data
+namespace BackRoll.Telegram.Database
 {
     public static class DbContextFactory
     {

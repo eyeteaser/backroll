@@ -2,7 +2,7 @@
 
 namespace BackRoll.Telegram.Models
 {
-    public class TelegramUserConfigurationModel
+    public class TelegramUserModel
     {
         public StreamingService StreamingService { get; set; }
     }

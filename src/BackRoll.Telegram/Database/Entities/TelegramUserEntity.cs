@@ -1,8 +1,8 @@
 ﻿using BackRoll.Services.Models;
 
-namespace BackRoll.Telegram.Data.Entities
+namespace BackRoll.Telegram.Database.Entities
 {
-    public class TelegramUserConfigurationEntity
+    public class TelegramUserEntity
     {
         public string Id { get; set; }
 

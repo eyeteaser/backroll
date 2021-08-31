@@ -14,7 +14,7 @@ namespace Tests.BackRoll.Telegram.Scenes
 {
     public class MessageSceneTests
     {
-        private readonly Mock<ITelegramUserConfiguration> _mockTelegramUserConfiguration;
+        private readonly Mock<ITelegramUserService> _mockTelegramUserService;
         private readonly Mock<IStreamingManager> _mockStreamingManager;
         private readonly Mock<ISessionService> _mockSessionService;
         private readonly Mock<IStreamingHelper> _mockStreamingHelper;
@@ -22,7 +22,7 @@ namespace Tests.BackRoll.Telegram.Scenes
 
         public MessageSceneTests()
         {
-            _mockTelegramUserConfiguration = new Mock<ITelegramUserConfiguration>();
+            _mockTelegramUserService = new Mock<ITelegramUserService>();
             _mockStreamingManager = new Mock<IStreamingManager>();
             _mockSessionService = new Mock<ISessionService>();
             _mockStreamingHelper = new Mock<IStreamingHelper>();
@@ -42,12 +42,12 @@ namespace Tests.BackRoll.Telegram.Scenes
                 Text = "any",
             };
 
-            _mockTelegramUserConfiguration
-                .Setup(x => x.GetConfiguration(It.IsAny<User>()))
-                .Throws(new TelegramUserConfigurationNotFoundException(null));
+            _mockTelegramUserService
+                .Setup(x => x.GetUser(It.IsAny<User>()))
+                .Throws(new TelegramUserNotFoundException(null));
 
             var messageScene = new MessageScene(
-                _mockTelegramUserConfiguration.Object,
+                _mockTelegramUserService.Object,
                 _mockStreamingManager.Object,
                 _mockSessionService.Object,
                 _mockStreamingHelper.Object,

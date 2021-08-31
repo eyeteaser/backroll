@@ -1,6 +1,6 @@
 ﻿using BackRoll.Telegram.Configuration;
-using BackRoll.Telegram.Data;
-using BackRoll.Telegram.Data.Repositories;
+using BackRoll.Telegram.Database;
+using BackRoll.Telegram.Database.Repositories;
 using BackRoll.Telegram.Scenes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +16,8 @@ namespace BackRoll.Telegram.Bot
             services.AddHostedService<TelegramWorker>();
             services.Configure<TelegramBotConfig>(configuration.GetSection(TelegramBotConfig.CONFIG_SECTION));
             services.AddSingleton(p => new TelegramBotClient(p.GetRequiredService<IOptions<TelegramBotConfig>>().Value.Secret));
-            services.AddSingleton<ITelegramUserConfiguration, TelegramUserConfiguration>();
-            services.AddSingleton<ITelegramUserConfigurationRepository, TelegramUserConfigurationRepository>();
+            services.AddSingleton<ITelegramUserService, TelegramUserService>();
+            services.AddSingleton<ITelegramUserRepository, TelegramUserRepository>();
             services.AddSingleton(p => DbContextFactory.Create(p.GetRequiredService<IOptions<TelegramBotConfig>>().Value.DbConnectionString));
 
             services.AddSingleton<IStreamingHelper, StreamingHelper>();

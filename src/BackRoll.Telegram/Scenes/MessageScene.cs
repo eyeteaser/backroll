@@ -14,7 +14,7 @@ namespace BackRoll.Telegram.Scenes
     {
         public const string CommandPrefix = "/message";
 
-        private readonly ITelegramUserConfiguration _telegramUserConfiguration;
+        private readonly ITelegramUserService _telegramUserService;
         private readonly IStreamingManager _streamingManager;
         private readonly ISessionService _sessionService;
         private readonly IStreamingHelper _streamingHelper;
@@ -23,13 +23,13 @@ namespace BackRoll.Telegram.Scenes
         public SceneType SceneType => SceneType.Message;
 
         public MessageScene(
-            ITelegramUserConfiguration telegramUserConfiguration,
+            ITelegramUserService telegramUserService,
             IStreamingManager streamingManager,
             ISessionService sessionService,
             IStreamingHelper streamingHelper,
             ILogger<MessageScene> logger)
         {
-            _telegramUserConfiguration = telegramUserConfiguration;
+            _telegramUserService = telegramUserService;
             _streamingManager = streamingManager;
             _sessionService = sessionService;
             _streamingHelper = streamingHelper;
@@ -48,7 +48,7 @@ namespace BackRoll.Telegram.Scenes
                 }
                 else
                 {
-                    var configuration = _telegramUserConfiguration.GetConfiguration(message.From);
+                    var configuration = _telegramUserService.GetUser(message.From);
                     streamingService = configuration.StreamingService;
                     text = message.Text;
                 }
@@ -62,7 +62,7 @@ namespace BackRoll.Telegram.Scenes
 
                 return SceneResponse.Fail("Sorry! Not found =(");
             }
-            catch (TelegramUserConfigurationNotFoundException)
+            catch (TelegramUserNotFoundException)
             {
                 _sessionService.SetLastRequest(message.From.Id, message.Text);
                 return SceneResponse.Fail(chainWith: SceneType.SetService);

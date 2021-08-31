@@ -9,18 +9,18 @@ namespace BackRoll.Telegram.Scenes
     public class SetServiceScene : IScene
     {
         public const string CommandPrefix = "/setservice";
-        private readonly ITelegramUserConfiguration _telegramUserConfiguration;
+        private readonly ITelegramUserService _telegramUserService;
         private readonly ISessionService _sessionService;
         private readonly IStreamingHelper _streamingHelper;
 
         public SceneType SceneType => SceneType.SetService;
 
         public SetServiceScene(
-            ITelegramUserConfiguration telegramUserConfiguration,
+            ITelegramUserService telegramUserService,
             ISessionService sessionService,
             IStreamingHelper streamingHelper)
         {
-            _telegramUserConfiguration = telegramUserConfiguration;
+            _telegramUserService = telegramUserService;
             _sessionService = sessionService;
             _streamingHelper = streamingHelper;
         }
@@ -30,7 +30,7 @@ namespace BackRoll.Telegram.Scenes
             if (message.Text.StartsWith(CommandPrefix)
                 && _streamingHelper.TryParseStreamingData(CommandPrefix, message.Text, out StreamingService streamingService))
             {
-                _telegramUserConfiguration.SetStreamingService(message.From, streamingService);
+                _telegramUserService.SetStreamingService(message.From, streamingService);
                 var lastRequest = _sessionService.GetAndDeleteLastRequest(message.From.Id);
                 var chainedScene = lastRequest != null ? SceneType.Message : SceneType.Undefined;
                 message.Text = lastRequest;

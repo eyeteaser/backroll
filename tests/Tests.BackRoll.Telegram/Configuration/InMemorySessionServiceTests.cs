@@ -1,8 +1,8 @@
-﻿using BackRoll.Services.Services;
+﻿using BackRoll.Telegram.Configuration;
 using FluentAssertions;
 using Xunit;
 
-namespace Tests.BackRoll.Services.Services
+namespace Tests.BackRoll.Telegram.Configuration
 {
     public class InMemorySessionServiceTests
     {

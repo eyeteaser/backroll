@@ -33,7 +33,6 @@ namespace BackRoll.Telegram.Configuration
             return new TelegramUserModel()
             {
                 StreamingService = telegramUser.StreamingService,
-                IsNew = telegramUser.IsNew,
             };
         }
 
@@ -50,7 +49,6 @@ namespace BackRoll.Telegram.Configuration
                 throw new TelegramUserNotFoundException(user);
             }
 
-            telegramUser.IsNew = false;
             _telegramUserRepository.Upsert(telegramUser);
         }
 
@@ -73,7 +71,6 @@ namespace BackRoll.Telegram.Configuration
                 {
                     Id = Guid.NewGuid().ToString(),
                     UserId = user.Id,
-                    IsNew = true,
                 };
             }
 

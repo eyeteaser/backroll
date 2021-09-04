@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using BackRoll.Services.Abstractions;
 using BackRoll.Services.Models;
 using BackRoll.Telegram.Bot;
 using BackRoll.Telegram.Configuration;

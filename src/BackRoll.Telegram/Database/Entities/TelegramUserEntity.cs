@@ -9,7 +9,5 @@ namespace BackRoll.Telegram.Database.Entities
         public long UserId { get; set; }
 
         public StreamingService StreamingService { get; set; }
-
-        public bool IsNew { get; set; }
     }
 }

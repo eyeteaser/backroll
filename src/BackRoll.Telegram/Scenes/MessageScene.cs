@@ -56,7 +56,7 @@ namespace BackRoll.Telegram.Scenes
                 var track = await _streamingManager.FindTrackAsync(text, streamingService);
 
                 SceneType chainWith = SceneType.Undefined;
-                if (user.IsNew)
+                if (_sessionService.GetAndDeleteUnprocessedScene(message.From.Id) == SceneType.Start)
                 {
                     _telegramUserService.SetNotNew(message.From);
                     chainWith = SceneType.Configured;

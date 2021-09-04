@@ -19,6 +19,7 @@ namespace BackRoll.Telegram.Bot
             services.AddSingleton<ITelegramUserService, TelegramUserService>();
             services.AddSingleton<ITelegramUserRepository, TelegramUserRepository>();
             services.AddSingleton(p => DbContextFactory.Create(p.GetRequiredService<IOptions<TelegramBotConfig>>().Value.DbConnectionString));
+            services.AddSingleton<ISessionService, InMemorySessionService>();
 
             services.AddSingleton<IStreamingHelper, StreamingHelper>();
 

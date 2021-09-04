@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BackRoll.Telegram.Scenes
 {
@@ -8,7 +9,8 @@ namespace BackRoll.Telegram.Scenes
 
         public Task<SceneResponse> ProcessAsync(TelegramMessage message)
         {
-            var response = SceneResponse.Ok("You are all set! Enjoy using this bot! 🧥👞🎙");
+            var markup = new ReplyKeyboardRemove();
+            var response = SceneResponse.Ok("You are all set! Enjoy using this bot! 🧥👞🎙", markup);
             return Task.FromResult(response);
         }
     }

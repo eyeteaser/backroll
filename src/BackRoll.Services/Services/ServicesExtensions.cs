@@ -8,7 +8,6 @@ namespace BackRoll.Services.Services
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddSingleton<IStreamingManager, StreamingManager>();
-            services.AddSingleton<ISessionService, InMemorySessionService>();
 
             return services;
         }

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BackRoll.Services.Models;
+using BackRoll.Telegram.Configuration;
 using BackRoll.Telegram.Database.Entities;
 using BackRoll.Telegram.Database.Repositories;
 using BackRoll.Telegram.Scenes;
@@ -19,11 +20,13 @@ namespace Tests.BackRoll.Telegram.Integration
     public class ScenesManagerTests
     {
         private readonly IScenesManager _scenesManager;
+        private readonly ISessionService _sessionService;
         private readonly ILiteCollection<TelegramUserEntity> _collection;
 
         public ScenesManagerTests(MainFixture mainFixture)
         {
             _scenesManager = mainFixture.Services.GetService<IScenesManager>();
+            _sessionService = mainFixture.Services.GetService<ISessionService>();
 
             var db = mainFixture.Services.GetService<LiteDatabase>();
             _collection = db.GetCollection<TelegramUserEntity>(TelegramUserRepository.CollectionName);
@@ -143,7 +146,7 @@ namespace Tests.BackRoll.Telegram.Integration
             response = await _scenesManager.ProcessAsync(callback);
 
             // assert
-            response.Messages.Should().HaveCount(3);
+            response.Messages.Should().HaveCount(2, TestsHelper.SerializePretty(response.Messages));
             response.Messages[1].Text.Should().Be(target);
         }
 
@@ -217,7 +220,7 @@ namespace Tests.BackRoll.Telegram.Integration
             response = await _scenesManager.ProcessAsync(callback);
 
             // assert
-            response.Messages.Should().HaveCount(1);
+            response.Messages.Should().HaveCount(1, TestsHelper.SerializePretty(response.Messages));
             var responseMessage = response.Messages.First();
             responseMessage.Text.Should().Be(target);
         }
@@ -241,6 +244,8 @@ namespace Tests.BackRoll.Telegram.Integration
             var responseMessage = response.Messages.First();
             responseMessage.ReplyMarkup.Should().NotBeNull()
                 .And.BeOfType<ReplyKeyboardMarkup>();
+
+            _sessionService.GetAndDeleteUnprocessedScene(user.Id);
         }
 
         [Fact]
@@ -271,6 +276,8 @@ namespace Tests.BackRoll.Telegram.Integration
                 .And.BeOfType<InlineKeyboardMarkup>();
             var markup = responseMessage.ReplyMarkup as InlineKeyboardMarkup;
             markup.InlineKeyboard.First().Should().Contain(x => x.CallbackData == "/setservice_YandexMusic");
+
+            _sessionService.GetAndDeleteUnprocessedScene(user.Id);
         }
 
         [Fact]
@@ -315,6 +322,8 @@ namespace Tests.BackRoll.Telegram.Integration
 
             var finishedConfigurationMessage = response.Messages[2];
             finishedConfigurationMessage.Text.Should().NotBeNullOrEmpty();
+
+            _sessionService.GetAndDeleteUnprocessedScene(user.Id);
         }
 
         [Fact]
@@ -352,6 +361,8 @@ namespace Tests.BackRoll.Telegram.Integration
 
             // assert
             response.Messages.Should().HaveCount(1);
+
+            _sessionService.GetAndDeleteUnprocessedScene(user.Id);
         }
     }
 }

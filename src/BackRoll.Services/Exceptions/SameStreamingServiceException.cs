@@ -12,7 +12,7 @@ namespace BackRoll.Services.Exceptions
             StreamingService = streamingService;
         }
 
-        public static SameStreamingServiceException Get(StreamingService streamingService)
+        public static SameStreamingServiceException Create(StreamingService streamingService)
         {
             return new SameStreamingServiceException(streamingService, ErrorCode.SameStreamingService, string.Empty);
         }

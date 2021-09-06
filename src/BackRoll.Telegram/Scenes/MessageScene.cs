@@ -84,7 +84,12 @@ namespace BackRoll.Telegram.Scenes
             catch (TrackNotFoundException e)
             {
                 _logger.LogInformation(e);
-                return SceneResponse.Fail("Sorry! Not found =(");
+                return SceneResponse.Fail("Track not found");
+            }
+            catch (WrongTrackFoundException e)
+            {
+                _logger.LogInformation(e);
+                return SceneResponse.Fail("Track not found. This is the closest match:\n" + e.Found.Url);
             }
         }
     }

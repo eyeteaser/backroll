@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BackRoll.Services.Abstractions;
+using BackRoll.Services.Comparers;
 using BackRoll.Services.Exceptions;
 using BackRoll.Services.Models;
 
@@ -10,10 +11,12 @@ namespace BackRoll.Services.Services
     public class StreamingManager : IStreamingManager
     {
         private readonly IStreamingService[] _streamingServices;
+        private readonly IEqualityComparer<Track> _trackEqualityComparer;
 
         public StreamingManager(IEnumerable<IStreamingService> streamingServices)
         {
             _streamingServices = streamingServices.ToArray();
+            _trackEqualityComparer = new FuzzyTrackEqualityComparer();
         }
 
         public async Task<Track> FindTrackAsync(string url, StreamingService streamingService)
@@ -33,7 +36,7 @@ namespace BackRoll.Services.Services
 
             if (sourceStreamingService == targetStreamingService)
             {
-                throw SameStreamingServiceException.Get(streamingService);
+                throw SameStreamingServiceException.Create(streamingService);
             }
 
             var originalTrack = await sourceStreamingService.GetTrackByUrlAsync(url);
@@ -47,6 +50,11 @@ namespace BackRoll.Services.Services
             if (track == null || string.IsNullOrEmpty(track.Url))
             {
                 throw TrackNotFoundException.TrackNotFoundByQuery(targetStreamingService.Name, request);
+            }
+
+            if (!_trackEqualityComparer.Equals(originalTrack, track))
+            {
+                throw WrongTrackFoundException.Create(originalTrack, track);
             }
 
             return track;

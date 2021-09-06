@@ -35,6 +35,7 @@ namespace Tests.BackRoll.Telegram.Integration
 
         [Theory]
         [InlineData("https://music.yandex.ru/track/610031", "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT")]
+        [InlineData("https://music.yandex.ru/album/2455685/track/21458627", "https://open.spotify.com/track/0wx01OL8bcCudYp6S4D1FK")]
         public async Task Process_CorrectSourceUrl_ShouldReturnTargetServiceUrl(string source, string target)
         {
             // arrange
@@ -85,6 +86,37 @@ namespace Tests.BackRoll.Telegram.Integration
             // assert
             response.Messages.Should().HaveCount(1);
             response.Messages.First().Text.Should().NotBeNullOrEmpty();
+        }
+
+        [Theory]
+        [InlineData("https://open.spotify.com/track/5l2aRFeetTo8rXRcas5U9L", "https://music.yandex.ru/album/4483976/track/35815467", StreamingService.YandexMusic)]
+        [InlineData("https://open.spotify.com/track/3ZFNg261EvTB9sBElOpoWj", "https://music.yandex.ru/album/11575610/track/69278557", StreamingService.YandexMusic)]
+        public async Task Process_TrackExistsInOneStreamingPlatformButNotInOther_ShouldReturnClosestMatch(
+            string source, string target, StreamingService streamingService)
+        {
+            // arrange
+            var configuration = new TelegramUserEntity()
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserId = 1,
+                StreamingService = streamingService,
+            };
+            _collection.Upsert(configuration);
+
+            var message = new TelegramMessage()
+            {
+                From = new User() { Id = configuration.UserId },
+                Text = source,
+            };
+
+            // act
+            var response = await _scenesManager.ProcessAsync(message);
+
+            // assert
+            response.Messages.Should().HaveCount(1);
+            var responseMessage = response.Messages.First();
+            responseMessage.Text.Should().NotBe(target)
+                .And.Contain(target);
         }
 
         [Theory]

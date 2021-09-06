@@ -79,5 +79,18 @@ namespace Tests.BackRoll.Services.Services
             act.Should().Throw<TrackNotFoundException>()
                 .Which.ErrorCode.Should().Be(ErrorCode.TrackNotFoundByUrl);
         }
+
+        [Theory]
+        [InlineData("https://open.spotify.com/track/5l2aRFeetTo8rXRcas5U9L")]
+        public void FindTrack_TrackExistsInOneStreamingPlatformButNotInOther_ShouldThrowException(string source)
+        {
+            // arrange
+            // act
+            Func<Task> act = () => _sut.FindTrackAsync(source, StreamingService.YandexMusic);
+
+            // assert
+            act.Should().Throw<WrongTrackFoundException>()
+                .Which.ErrorCode.Should().Be(ErrorCode.WrongTrackFound);
+        }
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace BackRoll.Services.Models
+﻿using System;
+using System.Linq;
+
+namespace BackRoll.Services.Models
 {
     public class Track
     {
@@ -9,5 +12,11 @@
         public Album Album { get; set; }
 
         public string Url { get; set; }
+
+        public override string ToString()
+        {
+            var artists = string.Join(',', (Artists ?? Array.Empty<Artist>()).Select(x => x.Name));
+            return $"Name: {Name}, Artists: {artists}, Album: {Album?.Name}, URL: {Url}";
+        }
     }
 }

@@ -8,5 +8,6 @@
         SameStreamingService,
         TrackNotFoundByUrl,
         TrackNotFoundByQuery,
+        WrongTrackFound,
     }
 }

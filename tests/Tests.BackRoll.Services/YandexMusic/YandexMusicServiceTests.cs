@@ -44,8 +44,8 @@ namespace Tests.BackRoll.Services.YandexMusic
             track.Should().NotBeNull();
             track.Name.Should().NotBeNullOrEmpty();
             track.Name.Should().Be(expectedName);
-            track.Url.Should().NotBeNullOrEmpty();
-            track.Url.Should().Be(expectedUrl);
+            track.Urls.Should().NotBeNullOrEmpty();
+            track.Urls.Should().Contain(expectedUrl);
             track.Artists.Should().NotBeNullOrEmpty();
             track.Artists.Should().OnlyContain(x => !string.IsNullOrEmpty(x.Name));
             track.Artists.Should().Contain(x => expectedArtists.Any(a => a == x.Name));
@@ -87,8 +87,8 @@ namespace Tests.BackRoll.Services.YandexMusic
             // assert
             track.Should().NotBeNull();
             track.Name.Should().NotBeNullOrEmpty();
-            track.Url.Should().NotBeNullOrEmpty();
-            track.Url.Should().Be(expectedUrl);
+            track.Urls.Should().NotBeNullOrEmpty();
+            track.Urls.Should().Contain(expectedUrl);
             track.Artists.Should().NotBeNullOrEmpty();
             track.Artists.Should().OnlyContain(x => !string.IsNullOrEmpty(x.Name));
             track.Album.Should().NotBeNull();
@@ -107,8 +107,8 @@ namespace Tests.BackRoll.Services.YandexMusic
             // assert
             track.Should().NotBeNull();
             track.Name.Should().NotBeNullOrEmpty();
-            track.Url.Should().NotBeNullOrEmpty();
-            track.Url.Should().Be(expectedUrl);
+            track.Urls.Should().NotBeNullOrEmpty();
+            track.Urls.Should().Contain(expectedUrl);
             track.Artists.Should().NotBeNullOrEmpty();
             track.Artists.Should().OnlyContain(x => !string.IsNullOrEmpty(x.Name));
             track.Album.Should().BeNull();

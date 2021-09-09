@@ -20,10 +20,10 @@ namespace BackRoll.Telegram.Scenes
         {
             _sessionService.SetUnprocessedScene(message.From.Id, SceneType);
 
-            var button = new KeyboardButton("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT");
+            var button = new KeyboardButton("https://music.yandex.ru/album/67593/track/610031");
             var markup = new ReplyKeyboardMarkup(new KeyboardButton[] { button }, true, true);
             var response = SceneResponse.Ok(
-                "Hi! This bot will help you convert track link from one streaming service to another. Let's see how it works. Please click on the Spotify link below.",
+                "Hi! This bot will help you convert track link from one streaming service to another. Let's see how it works. Please click on the Yandex Music link below.",
                 markup);
             return Task.FromResult(response);
         }

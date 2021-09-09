@@ -20,13 +20,16 @@ namespace Tests.BackRoll.Telegram.Integration
     public class ScenesManagerTests
     {
         private readonly IScenesManager _scenesManager;
-        private readonly ISessionService _sessionService;
         private readonly ILiteCollection<TelegramUserEntity> _collection;
+        private readonly User _user;
 
         public ScenesManagerTests(MainFixture mainFixture)
         {
             _scenesManager = mainFixture.Services.GetService<IScenesManager>();
-            _sessionService = mainFixture.Services.GetService<ISessionService>();
+
+            _user = new User() { Id = 1 };
+            var sessionService = mainFixture.Services.GetService<ISessionService>();
+            sessionService.GetAndDeleteUnprocessedScene(_user.Id);
 
             var db = mainFixture.Services.GetService<LiteDatabase>();
             _collection = db.GetCollection<TelegramUserEntity>(TelegramUserRepository.CollectionName);
@@ -42,14 +45,14 @@ namespace Tests.BackRoll.Telegram.Integration
             var configuration = new TelegramUserEntity()
             {
                 Id = Guid.NewGuid().ToString(),
-                UserId = 1,
+                UserId = _user.Id,
                 StreamingService = StreamingService.Spotify,
             };
             _collection.Upsert(configuration);
 
             var message = new TelegramMessage()
             {
-                From = new User() { Id = configuration.UserId },
+                From = _user,
                 Text = source,
             };
 
@@ -69,14 +72,14 @@ namespace Tests.BackRoll.Telegram.Integration
             var configuration = new TelegramUserEntity()
             {
                 Id = Guid.NewGuid().ToString(),
-                UserId = 1,
+                UserId = _user.Id,
                 StreamingService = StreamingService.Spotify,
             };
             _collection.Upsert(configuration);
 
             var message = new TelegramMessage()
             {
-                From = new User() { Id = configuration.UserId },
+                From = _user,
                 Text = source,
             };
 
@@ -98,14 +101,14 @@ namespace Tests.BackRoll.Telegram.Integration
             var configuration = new TelegramUserEntity()
             {
                 Id = Guid.NewGuid().ToString(),
-                UserId = 1,
+                UserId = _user.Id,
                 StreamingService = streamingService,
             };
             _collection.Upsert(configuration);
 
             var message = new TelegramMessage()
             {
-                From = new User() { Id = configuration.UserId },
+                From = _user,
                 Text = source,
             };
 
@@ -126,7 +129,7 @@ namespace Tests.BackRoll.Telegram.Integration
             // arrange
             var message = new TelegramMessage()
             {
-                From = new User() { Id = 1 },
+                From = _user,
                 Text = source,
             };
 
@@ -154,10 +157,9 @@ namespace Tests.BackRoll.Telegram.Integration
         public async Task Process_NoConfigurationAndSetService_ShouldReturnCorrectUrl(string source, string target)
         {
             // arrange
-            var user = new User() { Id = 1 };
             var message = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = source,
             };
 
@@ -170,7 +172,7 @@ namespace Tests.BackRoll.Telegram.Integration
 
             var callback = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = spotifyButton.CallbackData,
             };
 
@@ -187,17 +189,16 @@ namespace Tests.BackRoll.Telegram.Integration
         public async Task Process_HasSpotifyAsFavoriteServiceAndSendsSpotifyLink_ShouldSuggestOtherPlatformsToGetLink(string source)
         {
             // arrange
-            var user = new User() { Id = 1 };
             var configuration = new TelegramUserEntity()
             {
                 Id = Guid.NewGuid().ToString(),
-                UserId = user.Id,
+                UserId = _user.Id,
                 StreamingService = StreamingService.Spotify,
             };
             _collection.Upsert(configuration);
             var message = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = source,
             };
 
@@ -220,21 +221,20 @@ namespace Tests.BackRoll.Telegram.Integration
         }
 
         [Theory]
-        [InlineData("https://open.spotify.com/track/2r1ObHripAsIgOZ0rRwJBy", "https://music.yandex.ru/album/7113863/track/51143747")]
+        [InlineData("https://open.spotify.com/track/2r1ObHripAsIgOZ0rRwJBy", "https://music.yandex.ru/album/7113863/track/51143747\nhttps://music.yandex.ru/track/51143747")]
         public async Task Process_HasSpotifyAsFavoriteServiceAndSendsSpotifyLinkAndConvertsItToYandexMusic_ShouldReturnCorrectLink(string source, string target)
         {
             // arrange
-            var user = new User() { Id = 1 };
             var configuration = new TelegramUserEntity()
             {
                 Id = Guid.NewGuid().ToString(),
-                UserId = user.Id,
+                UserId = _user.Id,
                 StreamingService = StreamingService.Spotify,
             };
             _collection.Upsert(configuration);
             var message = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = source,
             };
 
@@ -244,7 +244,7 @@ namespace Tests.BackRoll.Telegram.Integration
 
             var callback = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = callbackData,
             };
 
@@ -261,10 +261,9 @@ namespace Tests.BackRoll.Telegram.Integration
         public async Task Process_StartScene_ShouldReturnWelcomeMessage()
         {
             // arrange
-            var user = new User() { Id = 1 };
             var message = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = "/start",
             };
 
@@ -276,25 +275,22 @@ namespace Tests.BackRoll.Telegram.Integration
             var responseMessage = response.Messages.First();
             responseMessage.ReplyMarkup.Should().NotBeNull()
                 .And.BeOfType<ReplyKeyboardMarkup>();
-
-            _sessionService.GetAndDeleteUnprocessedScene(user.Id);
         }
 
         [Fact]
         public async Task Process_StartSceneAndSendTrackUrl_ShouldAskToSetFavoriteService()
         {
             // arrange
-            var user = new User() { Id = 1 };
             var startMessage = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = "/start",
             };
             var response = await _scenesManager.ProcessAsync(startMessage);
             string trackUrl = (response.Messages.First().ReplyMarkup as ReplyKeyboardMarkup).Keyboard.First().First().Text;
             var message = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = trackUrl,
             };
 
@@ -308,18 +304,15 @@ namespace Tests.BackRoll.Telegram.Integration
                 .And.BeOfType<InlineKeyboardMarkup>();
             var markup = responseMessage.ReplyMarkup as InlineKeyboardMarkup;
             markup.InlineKeyboard.First().Should().Contain(x => x.CallbackData == "/setservice_YandexMusic");
-
-            _sessionService.GetAndDeleteUnprocessedScene(user.Id);
         }
 
         [Fact]
         public async Task Process_StartSceneAndSendTrackUrlAndConfigureFavoriteService_ShouldReturnTrackUrlAndFinalConfigurationMessage()
         {
             // arrange
-            var user = new User() { Id = 1 };
             var startMessage = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = "/start",
             };
             var response = await _scenesManager.ProcessAsync(startMessage);
@@ -327,16 +320,16 @@ namespace Tests.BackRoll.Telegram.Integration
             string trackUrl = (response.Messages.First().ReplyMarkup as ReplyKeyboardMarkup).Keyboard.First().First().Text;
             var trackMessage = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = trackUrl,
             };
             response = await _scenesManager.ProcessAsync(trackMessage);
 
             string callbackData = (response.Messages.First().ReplyMarkup as InlineKeyboardMarkup)
-                .InlineKeyboard.First().First(x => x.CallbackData == "/setservice_YandexMusic").CallbackData;
+                .InlineKeyboard.First().First(x => x.CallbackData == "/setservice_Spotify").CallbackData;
             var message = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = callbackData,
             };
 
@@ -344,7 +337,7 @@ namespace Tests.BackRoll.Telegram.Integration
             response = await _scenesManager.ProcessAsync(message);
 
             // assert
-            response.Messages.Should().HaveCount(3);
+            response.Messages.Should().HaveCount(3, TestsHelper.SerializePretty(response.Messages));
 
             var favoriteServiceMessage = response.Messages.First();
             favoriteServiceMessage.Text.Should().NotBeNullOrEmpty();
@@ -354,18 +347,15 @@ namespace Tests.BackRoll.Telegram.Integration
 
             var finishedConfigurationMessage = response.Messages[2];
             finishedConfigurationMessage.Text.Should().NotBeNullOrEmpty();
-
-            _sessionService.GetAndDeleteUnprocessedScene(user.Id);
         }
 
         [Fact]
         public async Task Process_StartSceneAndSendTrackUrlAndConfigureFavoriteServiceAndSendOneMoreMessage_ShouldReturnOnlyOneMessage()
         {
             // arrange
-            var user = new User() { Id = 1 };
             var startMessage = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = "/start",
             };
             var response = await _scenesManager.ProcessAsync(startMessage);
@@ -373,7 +363,7 @@ namespace Tests.BackRoll.Telegram.Integration
             string trackUrl = (response.Messages.First().ReplyMarkup as ReplyKeyboardMarkup).Keyboard.First().First().Text;
             var trackMessage = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = trackUrl,
             };
             response = await _scenesManager.ProcessAsync(trackMessage);
@@ -382,7 +372,7 @@ namespace Tests.BackRoll.Telegram.Integration
                 .InlineKeyboard.First().First(x => x.CallbackData == "/setservice_YandexMusic").CallbackData;
             var message = new TelegramMessage()
             {
-                From = user,
+                From = _user,
                 Text = callbackData,
             };
 
@@ -393,8 +383,6 @@ namespace Tests.BackRoll.Telegram.Integration
 
             // assert
             response.Messages.Should().HaveCount(1);
-
-            _sessionService.GetAndDeleteUnprocessedScene(user.Id);
         }
     }
 }

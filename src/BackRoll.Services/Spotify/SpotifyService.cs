@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using BackRoll.Services.Abstractions;
@@ -55,7 +55,7 @@ namespace BackRoll.Services.Spotify
             if (track != null)
             {
                 spotifyTrack.ExternalUrls.TryGetValue("spotify", out string url);
-                track.Url = url;
+                track.Urls = new List<string>() { url };
             }
 
             return track;

@@ -52,8 +52,8 @@ namespace Tests.BackRoll.Services.Spotify
             track.Name.Should().Be(expectedName);
             track.Artists.Should().NotBeNullOrEmpty();
             track.Artists.Should().Match(x => x.All(a => expectedArtists.Contains(a.Name)));
-            track.Url.Should().NotBeNullOrEmpty();
-            track.Url.Should().StartWith("https://open.spotify.com/track/");
+            track.Urls.Should().NotBeNullOrEmpty();
+            track.Urls.Should().Contain(x => x.StartsWith("https://open.spotify.com/track/"));
             track.Album.Should().NotBeNull();
             track.Album.Name.Should().Be(expectedAlbum);
             LogTrack(track);
@@ -81,7 +81,7 @@ namespace Tests.BackRoll.Services.Spotify
             // assert
             track.Name.Should().NotBeNullOrEmpty();
             track.Artists.Should().NotBeNullOrEmpty();
-            track.Url.Should().Be(expectedUrl);
+            track.Urls.Should().Contain(expectedUrl);
         }
 
         [Theory]

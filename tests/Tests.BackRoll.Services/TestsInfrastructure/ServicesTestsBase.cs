@@ -23,7 +23,7 @@ namespace Tests.BackRoll.Services.TestsInfrastructure
         {
             _testOutputHelper.WriteLine($"Track: {track.Name}");
             _testOutputHelper.WriteLine($"Artists: {string.Join(',', track.Artists.Select(x => x.Name))}");
-            _testOutputHelper.WriteLine($"Url: {track.Url}");
+            _testOutputHelper.WriteLine($"Url: {string.Join(' ', track.Urls)}");
             _testOutputHelper.WriteLine($"Album: {track.Album?.Name}");
         }
     }

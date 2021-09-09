@@ -64,7 +64,7 @@ namespace Tests.BackRoll.Services.Services
 
             // assert
             track.Should().NotBeNull();
-            track.Url.Should().Be(target);
+            track.Urls.Should().Contain(target);
         }
 
         [Theory]

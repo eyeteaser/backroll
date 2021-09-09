@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using BackRoll.Services.Abstractions;
@@ -91,15 +91,24 @@ namespace BackRoll.Services.YandexMusic
         {
             if (track != null)
             {
-                string trackUrl = "https://music.yandex.ru";
-                if (!string.IsNullOrEmpty(albumId))
+                track.Urls = new List<string>()
                 {
-                    trackUrl += $"/album/{albumId}";
-                }
-
-                trackUrl += $"/track/{trackId}";
-                track.Url = trackUrl;
+                    GetTrackUrl(trackId, albumId),
+                    GetTrackUrl(trackId),
+                };
             }
+        }
+
+        private static string GetTrackUrl(string trackId, string albumId = null)
+        {
+            string trackUrl = "https://music.yandex.ru";
+            if (!string.IsNullOrEmpty(albumId))
+            {
+                trackUrl += $"/album/{albumId}";
+            }
+
+            trackUrl += $"/track/{trackId}";
+            return trackUrl;
         }
 
         private Track Map(YTrack yandexMusicTrack, string albumId)

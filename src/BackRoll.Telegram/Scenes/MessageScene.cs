@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BackRoll.Services.Abstractions;
 using BackRoll.Services.Exceptions;
 using BackRoll.Services.Models;
@@ -7,6 +8,7 @@ using BackRoll.Telegram.Configuration;
 using BackRoll.Telegram.Exceptions;
 using BackRoll.Telegram.Extensions;
 using Microsoft.Extensions.Logging;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BackRoll.Telegram.Scenes
 {
@@ -62,7 +64,8 @@ namespace BackRoll.Telegram.Scenes
                     chainWith = SceneType.Configured;
                 }
 
-                return SceneResponse.Ok(track.Url, chainWith: chainWith);
+                var markup = new ReplyKeyboardRemove();
+                return SceneResponse.Ok(GetUrlsMessage(track.Urls), markup, chainWith);
             }
             catch (TelegramUserNotFoundException)
             {
@@ -89,8 +92,13 @@ namespace BackRoll.Telegram.Scenes
             catch (WrongTrackFoundException e)
             {
                 _logger.LogInformation(e);
-                return SceneResponse.Fail("Track not found. This is the closest match:\n" + e.Found.Url);
+                return SceneResponse.Fail("Track not found. This is the closest match:\n" + GetUrlsMessage(e.Found.Urls));
             }
+        }
+
+        private static string GetUrlsMessage(List<string> urls)
+        {
+            return string.Join('\n', urls);
         }
     }
 }

@@ -1,12 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BackRoll.Services.Models;
-using FuzzySharp;
 
 namespace BackRoll.Services.Comparers
 {
     public class FuzzyTrackEqualityComparer : IEqualityComparer<Track>
     {
+        private readonly IEqualityComparer<string> _fuzzyStringEqualityComparer;
+
+        public FuzzyTrackEqualityComparer()
+        {
+            _fuzzyStringEqualityComparer = new FuzzyStringEqualityComparer();
+        }
+
         public bool Equals(Track x, Track y)
         {
             if (y == null && x == null)
@@ -24,13 +30,7 @@ namespace BackRoll.Services.Comparers
                 return true;
             }
 
-            var ratio = Fuzz.PartialTokenSetRatio(x.Name, y.Name);
-            if (ratio > 90)
-            {
-                return true;
-            }
-
-            return false;
+            return _fuzzyStringEqualityComparer.Equals(x.Name, y.Name);
         }
 
         public int GetHashCode([DisallowNull] Track obj)

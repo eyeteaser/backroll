@@ -93,7 +93,6 @@ namespace Tests.BackRoll.Telegram.Integration
 
         [Theory]
         [InlineData("https://open.spotify.com/track/5l2aRFeetTo8rXRcas5U9L", "https://music.yandex.ru/album/4483976/track/35815467", StreamingService.YandexMusic)]
-        [InlineData("https://open.spotify.com/track/3ZFNg261EvTB9sBElOpoWj", "https://music.yandex.ru/album/11575610/track/69278557", StreamingService.YandexMusic)]
         public async Task Process_TrackExistsInOneStreamingPlatformButNotInOther_ShouldReturnClosestMatch(
             string source, string target, StreamingService streamingService)
         {

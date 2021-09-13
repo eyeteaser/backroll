@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using BackRoll.Services.Abstractions;
+using BackRoll.Services.Comparers;
 using BackRoll.Services.Models;
 using BackRoll.Services.Services;
 using Yandex.Music.Api;
@@ -20,6 +21,7 @@ namespace BackRoll.Services.YandexMusic
         private readonly YandexMusicApi _yandexMusicClient;
         private readonly AuthStorage _authStorage;
         private readonly IMapper _mapper;
+        private readonly IEqualityComparer<string> _fuzzyStringEqualityComparer;
 
         public override StreamingService Name => StreamingService.YandexMusic;
 
@@ -29,6 +31,7 @@ namespace BackRoll.Services.YandexMusic
         {
             (_yandexMusicClient, _authStorage) = GetYandexMusicClient(yandexMusicConfig);
             _mapper = mapper;
+            _fuzzyStringEqualityComparer = new FuzzyStringEqualityComparer();
         }
 
         protected override async Task<Track> GetTrackByUrlInternalAsync(TrackUrlInfo trackUrlInfo)
@@ -53,7 +56,11 @@ namespace BackRoll.Services.YandexMusic
                 var firstTrack = yandexMusicSearchResults.Result.Tracks.Results.First();
                 var trackAlbum = new Tuple<YSearchTrackModel, YSearchAlbumModel>(firstTrack, firstTrack.Albums.FirstOrDefault());
 
-                foreach (var yandexMusicTrack in yandexMusicSearchResults.Result.Tracks.Results)
+                var tracks = yandexMusicSearchResults.Result.Tracks.Results
+                    .Where(x => _fuzzyStringEqualityComparer.Equals(request.Track, x.Title))
+                    .ToArray();
+
+                foreach (var yandexMusicTrack in tracks)
                 {
                     var album = yandexMusicTrack.Albums.FirstOrDefault(x => x.Title == request.Album);
                     if (album != null)

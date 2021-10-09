@@ -22,6 +22,7 @@ namespace BackRoll.Services.YandexMusic
         private readonly AuthStorage _authStorage;
         private readonly IMapper _mapper;
         private readonly IEqualityComparer<string> _fuzzyStringEqualityComparer;
+        private readonly string _trackBaseUrl;
 
         public override StreamingService Name => StreamingService.YandexMusic;
 
@@ -32,6 +33,7 @@ namespace BackRoll.Services.YandexMusic
             (_yandexMusicClient, _authStorage) = GetYandexMusicClient(yandexMusicConfig);
             _mapper = mapper;
             _fuzzyStringEqualityComparer = new FuzzyStringEqualityComparer();
+            _trackBaseUrl = "https://music.yandex.ru";
         }
 
         protected override async Task<Track> GetTrackByUrlInternalAsync(TrackUrlInfo trackUrlInfo)
@@ -94,7 +96,7 @@ namespace BackRoll.Services.YandexMusic
             return (new YandexMusicApi(), authStorage);
         }
 
-        private static void SetTrackUrl(Track track, string trackId, string albumId)
+        private void SetTrackUrl(Track track, string trackId, string albumId)
         {
             if (track != null)
             {
@@ -106,9 +108,9 @@ namespace BackRoll.Services.YandexMusic
             }
         }
 
-        private static string GetTrackUrl(string trackId, string albumId = null)
+        private string GetTrackUrl(string trackId, string albumId = null)
         {
-            string trackUrl = "https://music.yandex.ru";
+            string trackUrl = _trackBaseUrl;
             if (!string.IsNullOrEmpty(albumId))
             {
                 trackUrl += $"/album/{albumId}";

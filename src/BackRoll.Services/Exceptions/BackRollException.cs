@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 
 namespace BackRoll.Services.Exceptions
 {
+    [Serializable]
     public abstract class BackRollException : Exception
     {
         public ErrorCode ErrorCode { get; }
@@ -17,6 +19,11 @@ namespace BackRoll.Services.Exceptions
             ErrorCode = errorCode;
             Args = args;
             MessageTemplate = message;
+        }
+
+        protected BackRollException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
         }
 
         private static string Format(string value, params object[] args)

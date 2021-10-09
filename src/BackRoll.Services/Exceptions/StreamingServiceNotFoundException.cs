@@ -1,11 +1,19 @@
-﻿using BackRoll.Services.Models;
+﻿using System;
+using System.Runtime.Serialization;
+using BackRoll.Services.Models;
 
 namespace BackRoll.Services.Exceptions
 {
+    [Serializable]
     public class StreamingServiceNotFoundException : BackRollException
     {
         protected StreamingServiceNotFoundException(ErrorCode errorCode, string message, params object[] args)
             : base(errorCode, message, args)
+        {
+        }
+
+        protected StreamingServiceNotFoundException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
 

@@ -12,10 +12,12 @@ namespace BackRoll.Services.Services
 
         public abstract string TrackUrlRegex { get; }
 
-        public Task<Track> FindTrackAsync(TrackSearchRequest request)
+        public async Task<Track> FindTrackAsync(TrackSearchRequest request)
         {
             string query = BuildTrackSearchQuery(request);
-            return FindTrackInternalAsync(request, query);
+            var track = await FindTrackInternalAsync(request, query);
+            PostProcessTrack(track);
+            return track;
         }
 
         public async Task<Track> GetTrackByUrlAsync(string url)
@@ -27,6 +29,7 @@ namespace BackRoll.Services.Services
                 track = await GetTrackByUrlInternalAsync(trackUrlInfo);
             }
 
+            PostProcessTrack(track);
             return track;
         }
 
@@ -53,6 +56,18 @@ namespace BackRoll.Services.Services
             }
 
             return trackUrlInfo;
+        }
+
+        /// <summary>
+        /// Replaces incorrect symbols.
+        /// </summary>
+        /// <param name="track">Track to process.</param>
+        protected virtual void PostProcessTrack(Track track)
+        {
+            if (track != null)
+            {
+                track.Name = track.Name.Replace("ё", "ё");
+            }
         }
 
         protected virtual string BuildTrackSearchQuery(TrackSearchRequest trackSearchRequest)

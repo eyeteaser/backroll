@@ -57,6 +57,7 @@ namespace Tests.BackRoll.Services.Services
         [InlineData("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", "https://music.yandex.ru/album/1910064/track/610031", StreamingService.YandexMusic)]
         [InlineData("https://music.yandex.ru/album/11575610/track/69278563", "https://open.spotify.com/track/3ZFNg261EvTB9sBElOpoWj", StreamingService.Spotify)]
         [InlineData("https://open.spotify.com/track/3ZFNg261EvTB9sBElOpoWj", "https://music.yandex.ru/album/2455685/track/21458627", StreamingService.YandexMusic)]
+        [InlineData("https://music.yandex.ru/album/3411166/track/28513217", "https://open.spotify.com/track/1EW0AKV1zJCp4C1dezH34F", StreamingService.Spotify)]
         public async Task FindTrack_CorrectUrl_ShouldReturnTrack(string source, string target, StreamingService targetName)
         {
             // arrange

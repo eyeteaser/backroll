@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackRoll.Services.Abstractions;
@@ -72,7 +73,10 @@ namespace BackRoll.Services.Services
 
         protected virtual string BuildTrackSearchQuery(TrackSearchRequest trackSearchRequest)
         {
-            string query = Regex.Replace(trackSearchRequest.Track, @"[^\p{L}\s+]", string.Empty);
+            // remove special characters that not part of the word
+            string query = string.Join(' ', trackSearchRequest.Track
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Where(x => Regex.IsMatch(x, @"\p{L}+[^\p{L}]?\p{L}+")));
             if (trackSearchRequest.Artists != null && trackSearchRequest.Artists.Any())
             {
                 query += $" {string.Join(",", trackSearchRequest.Artists)}";

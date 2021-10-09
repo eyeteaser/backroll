@@ -18,7 +18,7 @@ namespace Tests.BackRoll.Services.Spotify
         }
 
         [Fact]
-        public void CreateSpotifyClient()
+        public async Task CreateSpotifyClient()
         {
             // arrange
             // act
@@ -27,7 +27,7 @@ namespace Tests.BackRoll.Services.Spotify
             // assert
             spotifyClient.Should().NotBeNull();
             Func<Task> act = async () => await spotifyClient.Tracks.Get("1s6ux0lNiTziSrd7iUAADH");
-            act.Should().NotThrow();
+            await act.Should().NotThrowAsync();
         }
     }
 }

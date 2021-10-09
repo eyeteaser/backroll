@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using BackRoll.Telegram.Bot;
 using FluentAssertions;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using Xunit;
 
 namespace Tests.BackRoll.Telegram.Bot
@@ -18,7 +17,7 @@ namespace Tests.BackRoll.Telegram.Bot
         }
 
         [Fact]
-        public void ProcessUpdateAsync_UnknownUpdateType_ShouldNotThrowException()
+        public async Task ProcessUpdateAsync_UnknownUpdateType_ShouldNotThrowException()
         {
             // arrange
             var update = new Update();
@@ -27,7 +26,7 @@ namespace Tests.BackRoll.Telegram.Bot
             Func<Task> act = async () => await _sut.ProcessUpdateAsync(update);
 
             // assert
-            act.Should().NotThrow();
+            await act.Should().NotThrowAsync();
         }
     }
 }

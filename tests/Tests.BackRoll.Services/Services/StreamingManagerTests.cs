@@ -30,26 +30,26 @@ namespace Tests.BackRoll.Services.Services
 
         [Theory]
         [InlineData("i don't have url")]
-        public void FindTrack_InvalidUrl_ShouldThrowException(string text)
+        public async Task FindTrack_InvalidUrl_ShouldThrowException(string text)
         {
             // arrange
             // act
             Func<Task> act = () => _sut.FindTrackAsync(text, StreamingService.Undefined);
 
             // assert
-            act.Should().Throw<StreamingServiceNotFoundException>()
+            (await act.Should().ThrowAsync<StreamingServiceNotFoundException>())
                 .Which.ErrorCode.Should().Be(ErrorCode.MatchingServiceNotFound);
         }
 
         [Fact]
-        public void FindTrack_UnknownStreamingService_ShouldThrowException()
+        public async Task FindTrack_UnknownStreamingService_ShouldThrowException()
         {
             // arrange
             // act
             Func<Task> act = () => _sut.FindTrackAsync("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", StreamingService.Undefined);
 
             // assert
-            act.Should().Throw<StreamingServiceNotFoundException>()
+            (await act.Should().ThrowAsync<StreamingServiceNotFoundException>())
                 .Which.ErrorCode.Should().Be(ErrorCode.ServiceNotFound);
         }
 
@@ -70,27 +70,27 @@ namespace Tests.BackRoll.Services.Services
 
         [Theory]
         [InlineData("https://music.yandex.ru/album/1234214214/track/12341242131")]
-        public void FindTrack_CorrectUrlFormatButInvalidTrackOrAlbumId_ShouldThrowException(string url)
+        public async Task FindTrack_CorrectUrlFormatButInvalidTrackOrAlbumId_ShouldThrowException(string url)
         {
             // arrange
             // act
             Func<Task> act = () => _sut.FindTrackAsync(url, StreamingService.Spotify);
 
             // assert
-            act.Should().Throw<TrackNotFoundException>()
+            (await act.Should().ThrowAsync<TrackNotFoundException>())
                 .Which.ErrorCode.Should().Be(ErrorCode.TrackNotFoundByUrl);
         }
 
         [Theory]
         [InlineData("https://open.spotify.com/track/5l2aRFeetTo8rXRcas5U9L")]
-        public void FindTrack_TrackExistsInOneStreamingPlatformButNotInOther_ShouldThrowException(string source)
+        public async Task FindTrack_TrackExistsInOneStreamingPlatformButNotInOther_ShouldThrowException(string source)
         {
             // arrange
             // act
             Func<Task> act = () => _sut.FindTrackAsync(source, StreamingService.YandexMusic);
 
             // assert
-            act.Should().Throw<WrongTrackFoundException>()
+            (await act.Should().ThrowAsync<WrongTrackFoundException>())
                 .Which.ErrorCode.Should().Be(ErrorCode.WrongTrackFound);
         }
     }

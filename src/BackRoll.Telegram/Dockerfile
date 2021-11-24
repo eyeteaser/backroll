@@ -8,7 +8,6 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
 COPY ./BackRoll.sln ./
-COPY ./docker-compose.dcproj ./
 COPY src/*/*.csproj ./
 RUN for file in $(ls *.csproj); do mkdir -p src/${file%.*}/ && mv $file src/${file%.*}/; done
 COPY tests/*/*.csproj ./  

@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 .env
 data
+.DS_Store

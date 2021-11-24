@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8D490814
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackRoll.Services", "src\BackRoll.Services\BackRoll.Services.csproj", "{E4663E12-6785-4596-80B3-02B3AD3FB772}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.BackRoll.Services", "tests\Tests.BackRoll.Services\Tests.BackRoll.Services.csproj", "{AC36348E-F049-4760-8E2A-4D9A34F940AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.BackRoll.Services", "tests\Tests.BackRoll.Services\Tests.BackRoll.Services.csproj", "{AC36348E-F049-4760-8E2A-4D9A34F940AF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4887FF3F-03F0-4691-85D1-0FE7B168CDEC}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,8 +19,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackRoll.Telegram", "src\BackRoll.Telegram\BackRoll.Telegram.csproj", "{5DE1722B-4AC9-45F8-B4A5-6A1D426F5DCD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.BackRoll.Telegram.Integration", "tests\Tests.BackRoll.Telegram.Integration\Tests.BackRoll.Telegram.Integration.csproj", "{1C92DD38-A063-4403-A587-B08D7CDB0A27}"
-EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{56D96F59-0D02-4C54-A45A-1363719FFEBA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.BackRoll.Telegram", "tests\Tests.BackRoll.Telegram\Tests.BackRoll.Telegram.csproj", "{C5AFF616-9403-4D44-946A-833ACF591D1A}"
 EndProject
@@ -50,10 +48,6 @@ Global
 		{1C92DD38-A063-4403-A587-B08D7CDB0A27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C92DD38-A063-4403-A587-B08D7CDB0A27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C92DD38-A063-4403-A587-B08D7CDB0A27}.Release|Any CPU.Build.0 = Release|Any CPU
-		{56D96F59-0D02-4C54-A45A-1363719FFEBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56D96F59-0D02-4C54-A45A-1363719FFEBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56D96F59-0D02-4C54-A45A-1363719FFEBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56D96F59-0D02-4C54-A45A-1363719FFEBA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C5AFF616-9403-4D44-946A-833ACF591D1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C5AFF616-9403-4D44-946A-833ACF591D1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5AFF616-9403-4D44-946A-833ACF591D1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
